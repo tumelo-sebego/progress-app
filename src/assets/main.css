@@ -1,0 +1,8 @@
+body {
+  font-family: var(--font-family, "Inter", sans-serif);
+}
+
+.t-center {
+  display: flex;
+  justify-content: center;
+}

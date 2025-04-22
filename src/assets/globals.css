@@ -1,0 +1,311 @@
+/* Base styles */
+*,
+:before,
+:after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: #e5e7eb;
+  color: #232323;
+}
+
+:before,
+:after {
+  --tw-content: "";
+}
+
+html,
+:host,
+body {
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+  -webkit-tap-highlight-color: transparent;
+  color: #232323;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  line-height: inherit;
+  background-color: hsl(var(--background));
+  color: #232323;
+  font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+}
+
+/* CSS Variables */
+:root {
+  --background: 142 52% 60%;
+  --foreground: 0 0% 12%;
+  --card: 65 55% 95%;
+  --card-foreground: 0 0% 12%;
+  --popover: 65 55% 95%;
+  --popover-foreground: 0 0% 12%;
+  --primary: 142 40% 55%;
+  --primary-foreground: 65 55% 95%;
+  --secondary: 65 55% 95%;
+  --secondary-foreground: 0 0% 12%;
+  --muted: 60 10% 90%;
+  --muted-foreground: 0 0% 40%;
+  --accent: 142 40% 55%;
+  --accent-foreground: 65 55% 95%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 65 55% 95%;
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 142 40% 55%;
+  --radius: 1.5rem;
+}
+
+/* Layout classes */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.phone-frame {
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 0;
+  background-color: rgb(250 251 231);
+  padding: 1rem;
+  box-shadow: none;
+  min-height: 100vh;
+}
+
+.flex-col-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+/* Component styles */
+.activity-item {
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 0.75rem;
+  background-color: rgb(239 240 216);
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.3s;
+  animation-duration: 0.3s;
+}
+
+.activity-item:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.bottom-nav {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 9999px;
+  background-color: #232323 !important;
+  padding: 0.25rem;
+  color: rgb(255 255 255);
+}
+
+.bottom-nav-item {
+  display: flex;
+  min-width: 80px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0.5rem 1.5rem;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.3s;
+  animation-duration: 0.3s;
+}
+
+.bottom-nav-item.active,
+.bottom-nav-item.\!active {
+  background-color: rgb(146 209 141);
+  color: rgb(0 0 0);
+}
+
+/* Text styles */
+.login-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #232323;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #232323;
+}
+
+.secondary-text {
+  color: #232323;
+}
+
+.forgot-password {
+  color: #232323;
+}
+
+.link {
+  color: #3080e8;
+  text-decoration: none;
+}
+
+/* Container styles */
+.login-container {
+  padding: 1rem;
+}
+
+.content-container {
+  flex: 1;
+  padding: 0 1.5rem;
+  overflow-y: auto;
+}
+
+.progress-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.activities-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  padding-bottom: calc(1px + 4rem); /* 4rem is the height of the navbar */
+}
+
+.progress-view-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1rem;
+}
+
+.progress-buttons-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 1rem 0;
+}
+
+.progress-button {
+  width: 100%;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.icon-spacing {
+  margin-right: 0.5rem;
+}
+
+.active-button {
+  background-color: #81c784 !important;
+  color: #000000 !important;
+}
+
+.inactive-button {
+  background-color: #e2e8f0 !important;
+  color: #4b5563 !important;
+}
+
+.progress-message {
+  margin-top: 2rem;
+  text-align: center;
+  color: #666666;
+}
+
+.profile-container {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.profile-content {
+  text-align: center;
+}
+
+/* Animations */
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+@keyframes progress-animation {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+  to {
+    stroke-dasharray: var(--progress-value) 100;
+  }
+}
+
+.animate-progress-circle {
+  animation: progress-animation 1.5s ease-out forwards;
+}
+
+@keyframes pulse-gentle {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 2s ease-in-out infinite;
+}
+
+/* PrimeVue overrides */
+:deep(.p-card-title),
+:deep(.p-card-content),
+:deep(.p-card-body) {
+  color: #232323 !important;
+}
+
+:deep(.p-float-label label) {
+  color: #232323 !important;
+}
+
+:deep(.p-button .p-button-label),
+:deep(.p-button .p-button-icon) {
+  color: inherit;
+}
+
+.dark-text,
+:deep(.p-inputtext),
+:deep(.p-password-input) {
+  color: #232323 !important;
+}

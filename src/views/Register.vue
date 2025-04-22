@@ -1,45 +1,31 @@
 <template>
   <div class="register-page">
     <h1 class="app-title">Progress App</h1>
-    
+
     <div class="register-section">
-      <h2 class="register-header">Register</h2>
-      
+      <h2 class="register-header">Sign up</h2>
+
       <form @submit.prevent="register" class="register-form">
         <FloatLabel class="input-group">
-          <InputText 
-            id="email" 
-            v-model="email" 
-            class="input-field" 
-            required 
-          />
+          <InputText id="email" v-model="email" class="input-field" required />
           <label for="email">Email</label>
         </FloatLabel>
 
         <FloatLabel class="input-group">
-          <Password 
-            id="password" 
-            v-model="password" 
-            toggleMask 
+          <Password
+            id="password"
+            v-model="password"
+            toggleMask
             class="input-field"
-            required 
-            :feedback="false"
-          />
+            required
+            :feedback="false" />
           <label for="password">Password</label>
         </FloatLabel>
 
-        <Button
-          label="Register"
-          type="submit"
-          class="register-button"
-        />
-        
+        <Button label="Sign up" type="submit" class="register-button" />
+
         <router-link to="/login" custom v-slot="{ navigate }">
-          <Button
-            label="Login"
-            class="login-button"
-            @click="navigate"
-          />
+          <Button label="Login" class="login-button" @click="navigate" />
         </router-link>
       </form>
     </div>
@@ -118,7 +104,7 @@ async function register() {
 :deep(.input-field) {
   width: 100%;
   background-color: #eaeed3;
-  border-radius: 0.5rem;
+  border-radius: 32px;
 }
 
 :deep(.p-password) {
@@ -128,23 +114,30 @@ async function register() {
 :deep(.p-password-input) {
   width: 100%;
   background-color: #eaeed3;
-  border-radius: 0.5rem;
+  border-radius: 32px;
 }
 
 :deep(.p-float-label label) {
   color: #232323;
 }
 
+:deep(.p-button-label) {
+  color: #fafbe7;
+}
+
 .register-button {
   width: 100%;
-  border-radius: 0.5rem;
+  border-radius: 32px;
   margin-top: 1rem;
+  background-color: #50a65d;
+  border: none;
 }
 
 .login-button {
   width: 100%;
-  border-radius: 0.5rem;
+  border-radius: 32px;
   background-color: #232323;
   color: #f8faed;
+  border: none;
 }
 </style>

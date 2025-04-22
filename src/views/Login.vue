@@ -124,19 +124,25 @@ async function login() {
 }
 
 :deep(.p-float-label label) {
-  color: #232323;
+  color: #232323 !important;
+}
+
+:deep(.p-button-label) {
+  color: #fafbe7;
 }
 
 .login-button {
   width: 100%;
   border-radius: 32px;
   margin-top: 1rem;
+  background-color: #50a65d;
 }
 
 .signup-button {
   width: 100%;
   border-radius: 32px;
   background-color: #232323;
+  border: none;
   color: #f8faed;
 }
 
@@ -153,7 +159,7 @@ async function login() {
   text-decoration: underline;
 }
 
-.p-button-label {
-  color: #fafbe7;
+:deep(.p-floatlabel .p-floatlabel-over .input-group) {
+  margin-bottom: 1rem;
 }
 </style>

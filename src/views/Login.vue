@@ -1,50 +1,39 @@
 <template>
-  <div class="phone-frame">
-    <div class="login-container">
-      <Card class="p-shadow-3">
-        <template #title>
-          <span class="login-title">Login</span>
-        </template>
-        <template #content>
-          <form @submit.prevent="login" class="p-fluid">
-            <FloatLabel>
-              <InputText
-                id="email"
-                v-model="email"
-                class="dark-text"
-                required />
-              <label for="email">Email</label>
-            </FloatLabel>
+  <div class="login-page">
+    <h1 class="app-title">Progress App</h1>
 
-            <FloatLabel class="p-mt-3">
-              <Password
-                id="password"
-                v-model="password"
-                toggleMask
-                class="dark-text"
-                required />
-              <label for="password">Password</label>
-            </FloatLabel>
+    <div class="login-section">
+      <h2 class="login-header">Login</h2>
 
-            <Button
-              label="Login"
-              icon="pi pi-sign-in"
-              class="p-mt-3"
-              type="submit" />
-          </form>
-          <p class="p-mt-3 forgot-password">
-            <router-link to="/forgot-password" class="link">
-              Forgot Password?
-            </router-link>
-          </p>
-          <router-link to="/register" custom v-slot="{ navigate }">
-            <Button
-              label="Register"
-              class="p-button-secondary"
-              @click="navigate" />
+      <form @submit.prevent="login" class="login-form">
+        <FloatLabel class="input-group">
+          <InputText id="email" v-model="email" class="input-field" required />
+          <label for="email">Email</label>
+        </FloatLabel>
+
+        <FloatLabel class="input-group">
+          <Password
+            id="password"
+            v-model="password"
+            toggleMask
+            class="input-field"
+            required
+            :feedback="false" />
+          <label for="password">Password</label>
+        </FloatLabel>
+
+        <Button label="Login" type="submit" class="login-button" />
+
+        <router-link to="/register" custom v-slot="{ navigate }">
+          <Button label="Sign up" class="signup-button" @click="navigate" />
+        </router-link>
+
+        <div class="forgot-section">
+          <router-link to="/forgot-password" class="forgot-link">
+            Forgot Password?
           </router-link>
-        </template>
-      </Card>
+        </div>
+      </form>
     </div>
   </div>
 </template>
@@ -53,7 +42,6 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "@/supabase/config";
-import Card from "primevue/card";
 import InputText from "primevue/inputtext";
 import Password from "primevue/password";
 import Button from "primevue/button";
@@ -78,52 +66,94 @@ async function login() {
 </script>
 
 <style scoped>
-.phone-frame {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.login-page {
   min-height: 100vh;
   background-color: rgb(250 251 231);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
-.login-container {
-  width: 90%;
-  max-width: 400px;
+.app-title {
+  text-align: center;
+  color: #232323;
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: 3rem;
 }
 
-.login-title {
+.login-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.login-header {
+  color: #232323;
   font-size: 1.5rem;
   font-weight: 500;
-  color: #232323;
+  margin-bottom: 1.5rem;
+  text-align: left;
 }
 
-:deep(.p-inputtext) {
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.input-group {
+  width: 100%;
+}
+
+:deep(.input-field) {
+  width: 100%;
   background-color: #eaeed3;
+  border-radius: 32px;
+}
+
+:deep(.p-password) {
+  width: 100%;
 }
 
 :deep(.p-password-input) {
+  width: 100%;
   background-color: #eaeed3;
+  border-radius: 32px;
 }
 
-.dark-text {
+:deep(.p-float-label label) {
   color: #232323;
 }
 
-.forgot-password {
+.login-button {
+  width: 100%;
+  border-radius: 32px;
+  margin-top: 1rem;
+}
+
+.signup-button {
+  width: 100%;
+  border-radius: 32px;
+  background-color: #232323;
+  color: #f8faed;
+}
+
+.forgot-section {
   text-align: center;
 }
 
-.link {
-  color: #50a65d;
+.forgot-link {
+  color: #232323;
   text-decoration: none;
 }
 
-.link:hover {
+.forgot-link:hover {
   text-decoration: underline;
 }
 
-:deep(.p-card) {
-  background-color: rgb(250 251 231);
-  border-radius: 1rem;
+.p-button-label {
+  color: #fafbe7;
 }
 </style>

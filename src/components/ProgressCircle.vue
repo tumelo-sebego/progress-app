@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, defineProps } from "vue";
 import Chart from "primevue/chart";
 
 /* eslint-disable no-undef */

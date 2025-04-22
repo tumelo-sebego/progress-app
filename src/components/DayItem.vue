@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, defineProps, defineEmits } from "vue";
 import { useActivitiesStore } from "@/store/activities";
 
 const props = defineProps({

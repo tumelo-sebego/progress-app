@@ -64,7 +64,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, defineProps, defineEmits } from "vue";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import { useActivitiesStore } from "@/store/activities";

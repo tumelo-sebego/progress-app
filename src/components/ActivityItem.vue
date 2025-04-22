@@ -89,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted, watch } from "vue";
+import { ref, computed, onUnmounted, watch, defineProps } from "vue";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import { useActivitiesStore } from "@/store/activities";

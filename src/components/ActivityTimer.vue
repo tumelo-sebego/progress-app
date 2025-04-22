@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onUnmounted, onMounted, watch } from "vue";
+import { ref, computed, onUnmounted, onMounted, watch, defineProps, defineEmits } from "vue";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import { useActivitiesStore } from "@/store/activities";

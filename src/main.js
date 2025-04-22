@@ -13,7 +13,7 @@ import { supabase } from "./supabase/config";
 // import "@primeuix/themes/aura/theme.css";
 
 // Initialize Supabase auth state
-supabase.auth.onAuthStateChange((event, session) => {
+supabase.auth.onAuthStateChange((event) => {
   if (event === "SIGNED_IN") {
     router.push("/"); // Redirect to home when signed in
   } else if (event === "SIGNED_OUT") {

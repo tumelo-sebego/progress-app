@@ -11,7 +11,7 @@
     </div>
 
     <!-- Create Goal Form Section -->
-    <div class="create-goal-container" :class="{ 'slide-in': isCreateMode }">
+    <div class="create-goal-container" :class="{ 'slide-in': isCreateMode, 'slide-left': showActivities }">
       <h2 class="create-goal-title">Creating a new Goal</h2>
 
       <form class="goal-form" @submit.prevent>
@@ -50,6 +50,26 @@
       </div>
     </div>
 
+    <!-- Add Activities Section -->
+    <div class="add-activities-container" :class="{ 'slide-in': showActivities }">
+      <h2 class="create-goal-title">Add new Activities</h2>
+      
+      <div class="activities-info-card">
+        <p class="activities-info-text">Add new activities, the total points should be 100%</p>
+      </div>
+
+      <div class="navigation-buttons">
+        <button class="back-button" @click="goBackToGoalForm">
+          <span class="material-icons">chevron_left</span>
+          <span class="back-text">Back</span>
+        </button>
+      </div>
+
+      <button class="add-activity-button">
+        Add Activity
+      </button>
+    </div>
+
     <!-- Move Navbar outside the sliding containers -->
     <div class="navbar-container">
       <Navbar />
@@ -65,6 +85,7 @@ import Navbar from "../components/Navbar.vue";
 const userName = ref("");
 const isCreateMode = ref(false);
 const isValidDays = ref(false);
+const showActivities = ref(false);
 const goalForm = ref({
   name: "",
   days: "",
@@ -94,9 +115,12 @@ function validateDays() {
 
 function handleNext() {
   if (isValidDays.value) {
-    // Handle next step logic here
-    console.log("Moving to next step with form data:", goalForm.value);
+    showActivities.value = true;
   }
+}
+
+function goBackToGoalForm() {
+  showActivities.value = false;
 }
 </script>
 
@@ -177,6 +201,27 @@ function handleNext() {
 }
 
 .create-goal-container.slide-in {
+  transform: translateX(0);
+}
+
+.create-goal-container.slide-left {
+  transform: translateX(-100%);
+}
+
+.add-activities-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgb(250 251 231);
+  padding: 2rem;
+  padding-bottom: calc(4rem + 40px);
+  transform: translateX(100%);
+  transition: transform 0.3s ease-out;
+}
+
+.add-activities-container.slide-in {
   transform: translateX(0);
 }
 
@@ -261,5 +306,40 @@ function handleNext() {
 .next-text {
   font-size: 1rem;
   font-weight: 500;
+}
+
+.activities-info-card {
+  background-color: #eaeed3;
+  padding: 2rem;
+  border-radius: 1rem;
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.activities-info-text {
+  color: #232323;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.add-activity-button {
+  position: fixed;
+  bottom: calc(4rem + 20px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 4rem);
+  padding: 1rem;
+  border-radius: 32px;
+  background-color: #50a65d;
+  color: white;
+  border: none;
+  font-size: 1.125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.add-activity-button:hover {
+  background-color: #458f51;
 }
 </style>

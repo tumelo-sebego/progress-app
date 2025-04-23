@@ -1,6 +1,10 @@
 <template>
-  <div v-if="isInitialized" class="phone-frame">
-    <div class="h-full flex-col-container">
+  <div class="phone-frame">
+    <div v-if="!isInitialized" class="loading-container">
+      <div class="loading-circle"></div>
+    </div>
+
+    <div v-else class="h-full flex-col-container">
       <Header :name="username" :date="date" />
 
       <!-- Show AddGoal if no active goals -->
@@ -235,5 +239,31 @@ onMounted(async () => {
 
 .progress-container {
   margin-bottom: 1rem;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #232323;
+}
+
+.loading-circle {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #50a65d;
+  border-top: 4px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

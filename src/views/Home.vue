@@ -1,5 +1,5 @@
 <template>
-  <div class="phone-frame">
+  <div v-if="isInitialized" class="phone-frame">
     <div class="h-full flex-col-container">
       <Header :name="username" :date="date" />
 
@@ -117,6 +117,7 @@ const router = useRouter();
 const store = useActivityStore();
 const goalStore = useGoalSettingsStore();
 
+const isInitialized = ref(false);
 const username = ref("Tumelo");
 const activeTab = ref("home");
 const date = ref("");
@@ -163,9 +164,11 @@ const progressTypeMessage = computed(() => {
 });
 
 const checkAuth = async () => {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    router.push('/login');
+    router.push("/login");
     return false;
   }
   return true;
@@ -208,7 +211,7 @@ onMounted(async () => {
   const day = today.getDate();
   const weekday = today.toLocaleDateString("en-US", { weekday: "long" });
   const month = today.toLocaleDateString("en-US", { month: "long" });
-  date.value = `${weekday}, ${month} ${day}${getOrdinalSuffix(day)}`;
+  date.value = `${(weekday, month)} ${day}${getOrdinalSuffix(day)}`;
 
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
@@ -217,6 +220,7 @@ onMounted(async () => {
       await loadTasks();
     }
   }
+  isInitialized.value = true;
 });
 </script>
 

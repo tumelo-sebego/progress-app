@@ -52,9 +52,9 @@
             @input="validatePoints" />
         </div>
 
-        <button class="submit-button" :disabled="!isValid">
+        <Button type="submit" :disabled="!isValid" class="submit-button">
           Add Activity
-        </button>
+        </Button>
       </form>
     </div>
   </Dialog>
@@ -64,10 +64,15 @@
 import { ref, computed } from "vue";
 import Dialog from "primevue/dialog";
 
-defineProps({
+const props = defineProps({
   visible: {
     type: Boolean,
     required: true,
+  },
+  totalPoints: {
+    type: Number,
+    required: true,
+    default: 0,
   },
 });
 
@@ -87,9 +92,13 @@ function validatePoints() {
   let points = Number(form.value.points);
   if (points < 1) form.value.points = 1;
   if (points > 100) form.value.points = 100;
+  const remaining = 100 - props.totalPoints;
+  if (points > remaining) {
+    form.value.points = remaining;
+  }
 }
 
-function handleSubmit() {
+const handleSubmit = () => {
   if (!isValid.value) return;
 
   emit("add-activity", {
@@ -97,15 +106,9 @@ function handleSubmit() {
     points: Number(form.value.points),
   });
 
-  // Reset form
-  form.value = {
-    name: "",
-    points: "",
-  };
-
-  // Close dialog
+  form.value = { name: "", points: "" };
   emit("update:visible", false);
-}
+};
 </script>
 
 <style scoped>
@@ -204,6 +207,20 @@ function handleSubmit() {
   cursor: not-allowed;
 }
 
+.continue-option {
+  margin-top: 1rem;
+}
+
+.form-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-text {
+  margin-left: 0.5rem;
+}
+
 :deep(.p-dialog-mask) {
   background-color: rgb(250 251 231);
 }
@@ -221,5 +238,24 @@ function handleSubmit() {
   padding: 0;
   background-color: rgb(250 251 231);
   overflow: visible !important;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-container input[type="checkbox"] {
+  margin-right: 0.5rem;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  color: #2a332c;
+  font-size: 1rem;
 }
 </style>

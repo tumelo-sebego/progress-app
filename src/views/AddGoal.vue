@@ -68,7 +68,9 @@
         <div class="progress-section">
           <span class="progress-percentage">{{ totalPoints }}%</span>
           <div class="progress-bar-container">
-            <div class="progress-bar" :style="{ width: `${totalPoints}%` }"></div>
+            <div
+              class="progress-bar"
+              :style="{ width: `${totalPoints}%` }"></div>
           </div>
         </div>
       </div>
@@ -94,10 +96,21 @@
           <span class="back-text">Back</span>
         </button>
 
-        <button class="add-activity-button" @click="showDialog = true">
+        <button
+          v-if="totalPoints < 100"
+          class="add-activity-button"
+          @click="showDialog = true">
           Add Activity
         </button>
+
+        <button v-else class="done-button" @click="handleDone">Done</button>
       </div>
+    </div>
+
+    <!-- Loading View -->
+    <div v-if="isLoading" class="loading-view">
+      <div class="loading-circle"></div>
+      <p class="loading-text">Setting up your Goals and Activities</p>
     </div>
 
     <NewActivityDialog
@@ -123,6 +136,7 @@ const goalForm = ref({
 });
 const showDialog = ref(false);
 const activities = ref([]);
+const isLoading = ref(false);
 
 // Add computed property for total points
 const totalPoints = computed(() => {
@@ -166,7 +180,13 @@ function handleAddActivity(activity) {
 }
 
 function deleteActivity(activity) {
-  activities.value = activities.value.filter(a => a !== activity);
+  activities.value = activities.value.filter((a) => a !== activity);
+}
+
+async function handleDone() {
+  isLoading.value = true;
+  // Add your logic here to save goals and activities
+  // Then redirect to home or another view
 }
 </script>
 
@@ -486,5 +506,57 @@ function deleteActivity(activity) {
   background-color: #50a65d;
   border-radius: 4px;
   transition: width 0.3s ease;
+}
+
+.done-button {
+  width: 70%;
+  padding: 1rem;
+  border-radius: 32px;
+  background-color: #232323;
+  color: white;
+  border: none;
+  font-size: 1.125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.loading-view {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #232323;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  z-index: 9999;
+}
+
+.loading-circle {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #50a65d;
+  border-top: 4px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

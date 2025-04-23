@@ -9,7 +9,7 @@
         <button
           v-for="item in goalItems"
           :key="item.id"
-          @click="navigateToGoal(item.id)"
+          @click.stop="navigateToGoal(item.id)"
           class="nav-button"
           :class="{
             'active-tab': activeGoal === item.id,
@@ -24,19 +24,13 @@
         <button
           v-for="tab in tabs"
           :key="tab.id"
-          @click="navigateToTab(tab.id)"
+          @click.stop="navigateToTab(tab.id)"
           class="nav-button"
           :class="{ 'active-tab': isTabActive(tab.id) }">
-          <!-- Show text if active, otherwise show icon -->
           <span v-if="isTabActive(tab.id)" class="nav-text">{{
             tab.text
           }}</span>
-          <span
-            v-else
-            class="material-icons"
-            @click.stop="navigateToTab(tab.id)"
-            >{{ tab.icon }}</span
-          >
+          <span v-else class="material-icons">{{ tab.icon }}</span>
         </button>
       </div>
     </div>
@@ -44,11 +38,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { useGoalSettingsStore } from "@/store/goalSettings";
 
 const router = useRouter();
 const route = useRoute();
+const goalStore = useGoalSettingsStore();
 
 // State to track the active tab and active goal
 const activeTab = ref(""); // Default to no active tab
@@ -57,12 +53,22 @@ const isGoalsMenuOpen = ref(false); // Tracks if the submenu is logically open
 const isGoalsMenuVisible = ref(false); // Tracks if the submenu is visible (for animation)
 const isClosingSubmenu = ref(false); // Tracks if the submenu is animating down
 
-// Tabs for the main navigation
-const tabs = ref([
-  { id: "home", icon: "home", text: "Home" },
-  { id: "calendar", icon: "calendar_today", text: "Goals" },
-  { id: "profile", icon: "person", text: "Profile" },
-]);
+// Tabs for the main navigation with computed property
+const tabs = computed(() => {
+  const baseTabs = [
+    { id: "calendar", icon: "calendar_today", text: "Goals" },
+    { id: "profile", icon: "person", text: "Profile" },
+  ];
+
+  // Add either home or add-goal as the first tab
+  if (goalStore.hasActiveGoal) {
+    baseTabs.unshift({ id: "home", icon: "home", text: "Home" });
+  } else {
+    baseTabs.unshift({ id: "add-goal", icon: "add", text: "Add Goal" });
+  }
+
+  return baseTabs;
+});
 
 // Submenu items for the "Goals" tab
 const goalItems = ref([
@@ -82,23 +88,28 @@ function isTabActive(tabId) {
 
 // Function to handle navigation for main tabs
 function navigateToTab(tabId) {
+  if (tabId === "add-goal") {
+    // Close any open menus and navigate to add goal
+    closeGoalsMenu();
+    activeTab.value = tabId;
+    router.push("/add-goal");
+    return;
+  }
+
   if (tabId === "calendar") {
+    // Prevent any action if animation is in progress
     if (isClosingSubmenu.value) {
-      // Prevent toggling while the submenu is animating
       return;
     }
 
+    // Toggle menu state
     if (isGoalsMenuOpen.value) {
-      // If the submenu is already open, close it and revert to current view's tab
       closeGoalsMenu();
-      // Don't set activeTab here, let handleAnimationEnd handle it
     } else {
-      // Open the submenu
       openGoalsMenu();
-      activeTab.value = "calendar"; // Set "Goals" as the active tab only when opening
+      activeTab.value = "calendar";
     }
   } else {
-    // Close the Goals submenu and navigate to the selected tab
     closeGoalsMenu();
     activeTab.value = tabId;
     router.push(`/${tabId === "home" ? "" : tabId}`);
@@ -116,12 +127,11 @@ function navigateToGoal(goalId) {
 
 // Function to open the Goals submenu
 function openGoalsMenu() {
-  if (isClosingSubmenu.value) {
+  if (isClosingSubmenu.value || isGoalsMenuOpen.value) {
     return;
   }
   isGoalsMenuOpen.value = true;
   isGoalsMenuVisible.value = true;
-  isClosingSubmenu.value = false;
 }
 
 // Function to close the Goals submenu
@@ -129,8 +139,8 @@ function closeGoalsMenu() {
   if (!isGoalsMenuOpen.value || isClosingSubmenu.value) {
     return;
   }
-  isGoalsMenuOpen.value = false;
   isClosingSubmenu.value = true;
+  // isGoalsMenuOpen and isGoalsMenuVisible will be updated after animation ends
 }
 
 // Handle the end of the animation
@@ -138,6 +148,7 @@ function handleAnimationEnd() {
   if (isClosingSubmenu.value) {
     isGoalsMenuVisible.value = false;
     isClosingSubmenu.value = false;
+    isGoalsMenuOpen.value = false;
 
     // Only update the active tab if we're not on a progress view
     if (!route.path.includes("progress")) {

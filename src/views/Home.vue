@@ -1,17 +1,18 @@
 <template>
-  <div class="phone-frame">
-    <div v-if="!isInitialized" class="loading-container">
-      <div class="loading-circle"></div>
-    </div>
+  <div v-if="!shouldShowContent" class="loading-container">
+    <div class="loading-circle"></div>
+  </div>
 
-    <div v-else class="h-full flex-col-container">
+  <router-view v-if="!hasActiveGoal" name="add-goal" />
+
+  <div v-else class="phone-frame">
+    <div class="h-full flex-col-container">
       <Header :name="username" :date="date" />
 
       <!-- Show AddGoal if no active goals -->
-      <router-view v-if="!hasActiveGoal" name="add-goal" />
 
       <!-- Main Content when active goal exists -->
-      <div v-else class="content-container">
+      <div class="content-container">
         <template v-if="activeTab === 'home'">
           <div class="progress-container">
             <ProgressCircle :progress="progress" />
@@ -122,6 +123,7 @@ const store = useActivityStore();
 const goalStore = useGoalSettingsStore();
 
 const isInitialized = ref(false);
+const forceShow = ref(false);
 const username = ref("Tumelo");
 const activeTab = ref("home");
 const date = ref("");
@@ -210,12 +212,17 @@ const checkActiveGoal = async () => {
 };
 
 onMounted(async () => {
+  // Start 3 second timeout
+  setTimeout(() => {
+    forceShow.value = true;
+  }, 3000);
+
   // Format current date
   const today = new Date();
   const day = today.getDate();
   const weekday = today.toLocaleDateString("en-US", { weekday: "long" });
   const month = today.toLocaleDateString("en-US", { month: "long" });
-  date.value = `${(weekday, month)} ${day}${getOrdinalSuffix(day)}`;
+  date.value = `${weekday}, ${month} ${day}${getOrdinalSuffix(day)}`;
 
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
@@ -225,6 +232,10 @@ onMounted(async () => {
     }
   }
   isInitialized.value = true;
+});
+
+const shouldShowContent = computed(() => {
+  return isInitialized.value || forceShow.value;
 });
 </script>
 
@@ -245,8 +256,13 @@ onMounted(async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: #232323;
+  z-index: 9999;
 }
 
 .loading-circle {

@@ -1,6 +1,7 @@
 <template>
   <Dialog
-    v-model:visible="visible"
+    :visible="visible"
+    @update:visible="$emit('update:visible', $event)"
     modal
     :closable="false"
     class="dialog-container">
@@ -43,7 +44,7 @@
 import { ref, computed } from "vue";
 import Dialog from "primevue/dialog";
 
-const props = defineProps({
+defineProps({
   visible: {
     type: Boolean,
     required: true,

@@ -5,9 +5,12 @@
       <div class="no-goals-card">
         <p class="no-goals-text">You have no goals currently setup</p>
       </div>
-      <button class="setup-button" @click="startCreateGoal">
-        Setup a new Goal
-      </button>
+      <button class="setup-button" @click="startCreateGoal">Set up Goal</button>
+
+      <!-- Navbar slides with initial view -->
+      <div class="navbar-container">
+        <Navbar />
+      </div>
     </div>
 
     <!-- Create Goal Form Section -->
@@ -39,7 +42,7 @@
         </div>
       </form>
 
-      <div class="navigation-buttons">
+      <div class="bottom-buttons">
         <button class="back-button" @click="goBack">
           <span class="material-icons">chevron_left</span>
           <span class="back-text">Back</span>
@@ -74,26 +77,21 @@
         </div>
       </div>
 
-      <div class="navigation-buttons">
-        <button class="back-button" @click="goBackToGoalForm">
+      <div class="bottom-buttons activities-buttons">
+        <button class="back-button pill" @click="goBackToGoalForm">
           <span class="material-icons">chevron_left</span>
           <span class="back-text">Back</span>
         </button>
-      </div>
 
-      <button class="add-activity-button" @click="showDialog = true">
-        Add Activity
-      </button>
+        <button class="add-activity-button" @click="showDialog = true">
+          Add Activity
+        </button>
+      </div>
     </div>
 
     <NewActivityDialog
       v-model:visible="showDialog"
       @add-activity="handleAddActivity" />
-
-    <!-- Move Navbar outside the sliding containers -->
-    <div class="navbar-container">
-      <Navbar />
-    </div>
   </div>
 </template>
 
@@ -222,9 +220,10 @@ function handleAddActivity(activity) {
   bottom: 0;
   background-color: rgb(250 251 231);
   padding: 2rem;
-  padding-bottom: calc(4rem + 40px); /* Add padding for navbar */
+  padding-bottom: calc(4rem + 20px);
   transform: translateX(100%);
   transition: transform 0.3s ease-out;
+  overflow-y: auto;
 }
 
 .create-goal-container.slide-in {
@@ -243,9 +242,10 @@ function handleAddActivity(activity) {
   bottom: 0;
   background-color: rgb(250 251 231);
   padding: 2rem;
-  padding-bottom: calc(4rem + 40px);
+  padding-bottom: calc(4rem + 20px);
   transform: translateX(100%);
   transition: transform 0.3s ease-out;
+  overflow-y: auto;
 }
 
 .add-activities-container.slide-in {
@@ -266,6 +266,11 @@ function handleAddActivity(activity) {
   left: 0;
   right: 0;
   z-index: 100;
+  transition: transform 0.3s ease-out;
+}
+
+.content-container.slide-left .navbar-container {
+  transform: translateX(-100%);
 }
 
 .goal-form {
@@ -299,15 +304,21 @@ function handleAddActivity(activity) {
   box-shadow: 0 0 0 2px #50a65d;
 }
 
-.navigation-buttons {
+.bottom-buttons {
   position: fixed;
-  bottom: calc(4rem + 20px);
-  left: 1rem;
-  right: 1rem;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 10;
+  background-color: rgb(250 251 231);
+  z-index: 100;
+}
+
+.activities-buttons {
+  gap: 1rem;
 }
 
 .back-button,
@@ -322,6 +333,30 @@ function handleAddActivity(activity) {
   justify-content: center;
   color: #232323;
   gap: 0.5rem;
+}
+
+.back-button.pill {
+  background-color: #50a65d;
+  color: white;
+  width: 30%;
+}
+
+.add-activity-button {
+  width: 70%;
+  padding: 1rem;
+  border-radius: 32px;
+  background-color: #50a65d;
+  color: white;
+  border: none;
+  font-size: 1.125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.add-activity-button:hover,
+.back-button.pill:hover {
+  background-color: #458f51;
 }
 
 .back-button .material-icons,
@@ -347,27 +382,6 @@ function handleAddActivity(activity) {
   color: #232323;
   font-size: 1.125rem;
   font-weight: 500;
-}
-
-.add-activity-button {
-  position: fixed;
-  bottom: calc(4rem + 20px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 4rem);
-  padding: 1rem;
-  border-radius: 32px;
-  background-color: #50a65d;
-  color: white;
-  border: none;
-  font-size: 1.125rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.add-activity-button:hover {
-  background-color: #458f51;
 }
 
 .activities-list {

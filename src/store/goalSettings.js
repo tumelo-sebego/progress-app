@@ -4,7 +4,8 @@ import { supabase } from '@/supabase/config';
 export const useGoalSettingsStore = defineStore('goalSettings', {
   state: () => ({
     goals: [],
-    currentGoal: null
+    currentGoal: null,
+    hasActiveGoal: false
   }),
 
   actions: {
@@ -72,6 +73,30 @@ export const useGoalSettingsStore = defineStore('goalSettings', {
       } catch (error) {
         console.error('Error deleting goal:', error.message);
         throw error;
+      }
+    },
+
+    async checkActiveGoal() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('No user logged in');
+
+        const currentDate = new Date().toISOString();
+        const { data, error } = await supabase
+          .from('goals')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .gt('end_date', currentDate)
+          .single();
+
+        if (error && error.code !== 'PGRST116') throw error; // PGRST116 is the "no rows returned" error code
+
+        this.hasActiveGoal = !!data;
+        return data;
+      } catch (error) {
+        console.error('Error checking active goal:', error.message);
+        return null;
       }
     },
 

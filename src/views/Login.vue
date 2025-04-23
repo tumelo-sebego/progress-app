@@ -42,25 +42,44 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "@/supabase/config";
+import { useGoalSettingsStore } from "@/store/goalSettings";
 import InputText from "primevue/inputtext";
 import Password from "primevue/password";
 import Button from "primevue/button";
 import FloatLabel from "primevue/floatlabel";
 
 const router = useRouter();
+const goalStore = useGoalSettingsStore();
 const email = ref("");
 const password = ref("");
+const loading = ref(false);
+const errorMessage = ref("");
 
 async function login() {
+  loading.value = true;
+  errorMessage.value = "";
+
   try {
     const { error } = await supabase.auth.signInWithPassword({
       email: email.value,
       password: password.value,
     });
     if (error) throw error;
-    router.push("/");
+
+    // Check for active goals
+    const activeGoal = await goalStore.checkActiveGoal();
+    
+    // Route based on active goal existence
+    if (!activeGoal) {
+      router.push("/add-goal");
+    } else {
+      router.push("/");
+    }
   } catch (error) {
     console.error("Login failed", error.message);
+    errorMessage.value = error.message;
+  } finally {
+    loading.value = false;
   }
 }
 </script>

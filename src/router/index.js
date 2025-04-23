@@ -8,6 +8,7 @@ import DailyProgress from "../views/DailyProgress.vue";
 import WeeklyProgress from "../views/WeeklyProgress.vue";
 import GoalProgress from "../views/GoalProgress.vue";
 import AddActivity from "../views/Add-Activity.vue";
+import AddGoal from "../views/AddGoal.vue";
 
 const routes = [
   {
@@ -36,6 +37,12 @@ const routes = [
     path: "/add-activity",
     name: "AddActivity",
     component: AddActivity,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/add-goal",
+    name: "AddGoal",
+    component: AddGoal,
     meta: { requiresAuth: true },
   },
   {

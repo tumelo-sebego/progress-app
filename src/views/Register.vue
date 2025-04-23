@@ -27,7 +27,19 @@
           <label for="password">Password</label>
         </FloatLabel>
 
-        <Button label="Sign up" type="submit" class="register-button" />
+        <Button
+          label="Sign up"
+          type="submit"
+          class="register-button"
+          :loading="loading" />
+
+        <div v-if="successMessage" class="success-message">
+          {{ successMessage }}
+        </div>
+
+        <div v-if="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
 
         <router-link to="/login" custom v-slot="{ navigate }">
           <Button label="Login" class="login-button" @click="navigate" />
@@ -50,10 +62,17 @@ const router = useRouter();
 const name = ref("");
 const email = ref("");
 const password = ref("");
+const loading = ref(false);
+const successMessage = ref("");
+const errorMessage = ref("");
 
 async function register() {
+  loading.value = true;
+  errorMessage.value = "";
+  successMessage.value = "";
+
   try {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: email.value,
       password: password.value,
       options: {
@@ -62,10 +81,18 @@ async function register() {
         },
       },
     });
+
     if (error) throw error;
-    router.push("/login");
+
+    successMessage.value =
+      "Registration successful! Please check your email to verify your account.";
+    setTimeout(() => {
+      router.push("/login");
+    }, 3000);
   } catch (error) {
-    console.error("Registration failed", error.message);
+    errorMessage.value = error.message;
+  } finally {
+    loading.value = false;
   }
 }
 </script>
@@ -150,5 +177,17 @@ async function register() {
   background-color: #232323;
   color: #f8faed;
   border: none;
+}
+
+.success-message {
+  color: #50a65d;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.error-message {
+  color: #dc3545;
+  text-align: center;
+  margin-top: 1rem;
 }
 </style>

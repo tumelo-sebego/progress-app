@@ -10,8 +10,6 @@ import "./assets/globals.css";
 import "primeicons/primeicons.css";
 import { supabase } from "./supabase/config";
 
-// import "@primeuix/themes/aura/theme.css";
-
 // Initialize Supabase auth state
 supabase.auth.onAuthStateChange((event) => {
   if (event === "SIGNED_IN") {
@@ -22,8 +20,10 @@ supabase.auth.onAuthStateChange((event) => {
 });
 
 const app = createApp(App);
+const pinia = createPinia();
+
+app.use(pinia);
 app.use(PrimeVue, {
-  // Default theme configuration
   theme: {
     preset: Aura,
     options: {
@@ -33,5 +33,4 @@ app.use(PrimeVue, {
   },
 });
 app.use(router);
-app.use(createPinia());
 app.mount("#app");

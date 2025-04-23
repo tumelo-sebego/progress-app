@@ -4,12 +4,6 @@
       <h1 class="greeting-title">Ola, {{ userName }}</h1>
       <div class="no-goals-card">
         <p class="no-goals-text">You have no goals currently setup</p>
-        <div class="progress-section">
-          <span class="progress-percentage">{{ totalPoints }}%</span>
-          <div class="progress-bar-container">
-            <div class="progress-bar" :style="{ width: `${totalPoints}%` }"></div>
-          </div>
-        </div>
       </div>
       <button class="setup-button" @click="startCreateGoal">Set up Goal</button>
 
@@ -71,6 +65,12 @@
         <p class="activities-info-text">
           Add new activities, the total points should be 100%
         </p>
+        <div class="progress-section">
+          <span class="progress-percentage">{{ totalPoints }}%</span>
+          <div class="progress-bar-container">
+            <div class="progress-bar" :style="{ width: `${totalPoints}%` }"></div>
+          </div>
+        </div>
       </div>
 
       <div class="activities-list" v-if="activities.length > 0">
@@ -102,6 +102,7 @@
 
     <NewActivityDialog
       v-model:visible="showDialog"
+      :totalPoints="totalPoints"
       @add-activity="handleAddActivity" />
   </div>
 </template>

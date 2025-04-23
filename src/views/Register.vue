@@ -72,7 +72,7 @@ async function register() {
   successMessage.value = "";
 
   try {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email: email.value,
       password: password.value,
       options: {

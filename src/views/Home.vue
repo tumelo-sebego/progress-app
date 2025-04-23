@@ -47,8 +47,11 @@
       <template v-else>
         <Header :name="username" :date="date" />
 
-        <!-- Main Content -->
-        <div class="content-container">
+        <!-- Show AddGoal if no active goals -->
+        <router-view v-if="!hasActiveGoal" name="add-goal" />
+
+        <!-- Main Content when active goal exists -->
+        <div v-else class="content-container">
           <template v-if="activeTab === 'home'">
             <div class="progress-container">
               <ProgressCircle :progress="progress" />
@@ -145,6 +148,8 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useActivitiesStore } from "@/store/activities";
+import { useGoalSettingsStore } from "@/store/goalSettings";
+import { useRouter } from "vue-router";
 import Card from "primevue/card";
 import InputText from "primevue/inputtext";
 import Password from "primevue/password";
@@ -157,6 +162,10 @@ import Navbar from "@/components/Navbar.vue";
 import ActivityTimer from "@/components/ActivityTimer.vue";
 import { login, getTasks } from "@/api";
 
+const router = useRouter();
+const store = useActivitiesStore();
+const goalStore = useGoalSettingsStore();
+
 const isAuthenticated = ref(false);
 const email = ref("");
 const password = ref("");
@@ -164,7 +173,8 @@ const username = ref("Tumelo");
 const activeTab = ref("home");
 const date = ref("");
 const activeProgressType = ref("daily");
-const store = useActivitiesStore();
+const hasActiveGoal = ref(false);
+
 const latestActivities = computed(() => {
   console.log("Store activities:", store.activities);
   console.log("Latest activities:", store.getLatestActivities);
@@ -250,7 +260,16 @@ const progress = computed(() => {
     .reduce((total, activity) => total + activity.points, 0);
 });
 
-onMounted(() => {
+const checkActiveGoal = async () => {
+  const activeGoal = await goalStore.checkActiveGoal();
+  hasActiveGoal.value = !!activeGoal;
+
+  if (!hasActiveGoal.value) {
+    router.push("/add-goal");
+  }
+};
+
+onMounted(async () => {
   // Format current date
   const today = new Date();
   const day = today.getDate();
@@ -262,6 +281,7 @@ onMounted(() => {
 
   checkAuth();
   if (isAuthenticated.value) {
+    await checkActiveGoal();
     loadTasks();
   }
 });

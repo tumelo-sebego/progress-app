@@ -68,7 +68,7 @@ async function login() {
 
     // Check for active goals
     const activeGoal = await goalStore.checkActiveGoal();
-    
+
     // Route based on active goal existence
     if (!activeGoal) {
       router.push("/add-goal");

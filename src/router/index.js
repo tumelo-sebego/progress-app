@@ -14,7 +14,10 @@ const routes = [
   {
     path: "/",
     name: "Home",
-    component: Home,
+    components: {
+      default: Home,
+      "add-goal": AddGoal,
+    },
     meta: { requiresAuth: true },
   },
   {

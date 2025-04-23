@@ -1,39 +1,43 @@
-import { defineStore } from 'pinia';
-import { supabase } from '@/supabase/config';
+import { defineStore } from "pinia";
+import { supabase } from "@/supabase/config";
 
-export const useGoalSettingsStore = defineStore('goalSettings', {
+export const useGoalSettingsStore = defineStore("goalSettings", {
   state: () => ({
     goals: [],
     currentGoal: null,
-    hasActiveGoal: false
+    hasActiveGoal: false,
   }),
 
   actions: {
     async fetchGoals() {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('No user logged in');
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) throw new Error("No user logged in");
 
         const { data, error } = await supabase
-          .from('goals')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+          .from("goals")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
 
         if (error) throw error;
         this.goals = data;
       } catch (error) {
-        console.error('Error fetching goals:', error.message);
+        console.error("Error fetching goals:", error.message);
       }
     },
 
     async addGoal(goalData) {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('No user logged in');
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) throw new Error("No user logged in");
 
         const { data, error } = await supabase
-          .from('goals')
+          .from("goals")
           .insert([{ ...goalData, user_id: user.id }])
           .select();
 
@@ -41,7 +45,7 @@ export const useGoalSettingsStore = defineStore('goalSettings', {
         await this.fetchGoals();
         return data[0];
       } catch (error) {
-        console.error('Error adding goal:', error.message);
+        console.error("Error adding goal:", error.message);
         throw error;
       }
     },
@@ -49,14 +53,14 @@ export const useGoalSettingsStore = defineStore('goalSettings', {
     async updateGoal(goalId, updates) {
       try {
         const { error } = await supabase
-          .from('goals')
+          .from("goals")
           .update(updates)
-          .eq('id', goalId);
+          .eq("id", goalId);
 
         if (error) throw error;
         await this.fetchGoals();
       } catch (error) {
-        console.error('Error updating goal:', error.message);
+        console.error("Error updating goal:", error.message);
         throw error;
       }
     },
@@ -64,44 +68,46 @@ export const useGoalSettingsStore = defineStore('goalSettings', {
     async deleteGoal(goalId) {
       try {
         const { error } = await supabase
-          .from('goals')
+          .from("goals")
           .delete()
-          .eq('id', goalId);
+          .eq("id", goalId);
 
         if (error) throw error;
         await this.fetchGoals();
       } catch (error) {
-        console.error('Error deleting goal:', error.message);
+        console.error("Error deleting goal:", error.message);
         throw error;
       }
     },
 
     async checkActiveGoal() {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('No user logged in');
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) throw new Error("No user logged in");
 
         const currentDate = new Date().toISOString();
         const { data, error } = await supabase
-          .from('goals')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('status', 'active')
-          .gt('end_date', currentDate)
+          .from("goals")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("status", "active")
+          .gt("end_date", currentDate)
           .single();
 
-        if (error && error.code !== 'PGRST116') throw error; // PGRST116 is the "no rows returned" error code
+        if (error && error.code !== "PGRST116") throw error; // PGRST116 is the "no rows returned" error code
 
         this.hasActiveGoal = !!data;
         return data;
       } catch (error) {
-        console.error('Error checking active goal:', error.message);
+        console.error("Error checking active goal:", error.message);
         return null;
       }
     },
 
     setCurrentGoal(goal) {
       this.currentGoal = goal;
-    }
-  }
+    },
+  },
 });

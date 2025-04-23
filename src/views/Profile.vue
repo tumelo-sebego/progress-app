@@ -4,6 +4,7 @@
     <div class="content-container">
       <h1 class="page-title">Profile</h1>
       <div v-if="user" class="profile-info">
+        <p v-if="user.user_metadata?.full_name">Name: {{ user.user_metadata.full_name }}</p>
         <p>Email: {{ user.email }}</p>
         <button @click="handleLogout" class="logout-button">Logout</button>
       </div>

@@ -7,6 +7,11 @@
 
       <form @submit.prevent="register" class="register-form">
         <FloatLabel class="input-group">
+          <InputText id="name" v-model="name" class="input-field" required />
+          <label for="name">Name</label>
+        </FloatLabel>
+
+        <FloatLabel class="input-group">
           <InputText id="email" v-model="email" class="input-field" required />
           <label for="email">Email</label>
         </FloatLabel>
@@ -42,6 +47,7 @@ import Button from "primevue/button";
 import FloatLabel from "primevue/floatlabel";
 
 const router = useRouter();
+const name = ref("");
 const email = ref("");
 const password = ref("");
 
@@ -50,6 +56,11 @@ async function register() {
     const { error } = await supabase.auth.signUp({
       email: email.value,
       password: password.value,
+      options: {
+        data: {
+          full_name: name.value,
+        },
+      },
     });
     if (error) throw error;
     router.push("/login");

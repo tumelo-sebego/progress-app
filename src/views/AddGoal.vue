@@ -11,7 +11,9 @@
     </div>
 
     <!-- Create Goal Form Section -->
-    <div class="create-goal-container" :class="{ 'slide-in': isCreateMode, 'slide-left': showActivities }">
+    <div
+      class="create-goal-container"
+      :class="{ 'slide-in': isCreateMode, 'slide-left': showActivities }">
       <h2 class="create-goal-title">Creating a new Goal</h2>
 
       <form class="goal-form" @submit.prevent>
@@ -51,11 +53,25 @@
     </div>
 
     <!-- Add Activities Section -->
-    <div class="add-activities-container" :class="{ 'slide-in': showActivities }">
+    <div
+      class="add-activities-container"
+      :class="{ 'slide-in': showActivities }">
       <h2 class="create-goal-title">Add new Activities</h2>
-      
+
       <div class="activities-info-card">
-        <p class="activities-info-text">Add new activities, the total points should be 100%</p>
+        <p class="activities-info-text">
+          Add new activities, the total points should be 100%
+        </p>
+      </div>
+
+      <div class="activities-list" v-if="activities.length > 0">
+        <div
+          v-for="activity in activities"
+          :key="activity.name"
+          class="activity-item">
+          <span class="activity-name">{{ activity.name }}</span>
+          <span class="activity-points">{{ activity.points }}%</span>
+        </div>
       </div>
 
       <div class="navigation-buttons">
@@ -65,10 +81,14 @@
         </button>
       </div>
 
-      <button class="add-activity-button">
+      <button class="add-activity-button" @click="showDialog = true">
         Add Activity
       </button>
     </div>
+
+    <NewActivityDialog
+      v-model:visible="showDialog"
+      @add-activity="handleAddActivity" />
 
     <!-- Move Navbar outside the sliding containers -->
     <div class="navbar-container">
@@ -81,6 +101,7 @@
 import { ref, onMounted } from "vue";
 import { supabase } from "@/supabase/config";
 import Navbar from "../components/Navbar.vue";
+import NewActivityDialog from "../components/NewActivityDialog.vue";
 
 const userName = ref("");
 const isCreateMode = ref(false);
@@ -90,6 +111,8 @@ const goalForm = ref({
   name: "",
   days: "",
 });
+const showDialog = ref(false);
+const activities = ref([]);
 
 onMounted(async () => {
   const {
@@ -121,6 +144,10 @@ function handleNext() {
 
 function goBackToGoalForm() {
   showActivities.value = false;
+}
+
+function handleAddActivity(activity) {
+  activities.value.push(activity);
 }
 </script>
 
@@ -341,5 +368,30 @@ function goBackToGoalForm() {
 
 .add-activity-button:hover {
   background-color: #458f51;
+}
+
+.activities-list {
+  margin-top: 1.5rem;
+}
+
+.activity-item {
+  background-color: #eaeed3;
+  padding: 1rem 1.5rem;
+  border-radius: 32px;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.activity-name {
+  color: #232323;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.activity-points {
+  color: #232323;
+  font-weight: 600;
 }
 </style>

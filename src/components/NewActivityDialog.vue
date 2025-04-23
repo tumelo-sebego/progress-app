@@ -4,39 +4,59 @@
     @update:visible="$emit('update:visible', $event)"
     modal
     :closable="false"
-    class="dialog-container">
-    <template #header>
-      <h3 class="dialog-title">New Activity</h3>
-    </template>
-
-    <form class="activity-form" @submit.prevent="handleSubmit">
-      <div class="form-group">
-        <label class="form-label">Activity Name</label>
-        <input
-          type="text"
-          v-model="form.name"
-          class="form-input"
-          placeholder="Go for walk" />
+    :showHeader="false"
+    :dismissableMask="true"
+    :contentStyle="{ padding: '0', height: '100vh' }"
+    :style="{
+      width: '100vw',
+      height: '100vh',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      margin: '0',
+      borderRadius: '0',
+    }"
+    position="top"
+    class="activity-dialog"
+    transition="dialog">
+    <div class="dialog-wrapper" :class="{ 'dialog-enter-active': visible }">
+      <!-- Close button -->
+      <div class="close-button-container">
+        <Button
+          icon="pi pi-times"
+          @click="$emit('update:visible', false)"
+          text
+          class="close-button" />
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Activity Points</label>
-        <input
-          type="number"
-          v-model="form.points"
-          class="form-input"
-          min="1"
-          max="100"
-          placeholder="10"
-          @input="validatePoints" />
-      </div>
-    </form>
+      <h2 class="dialog-title">New Activity</h2>
 
-    <template #footer>
-      <button class="submit-button" @click="handleSubmit" :disabled="!isValid">
-        Add Activity
-      </button>
-    </template>
+      <form class="activity-form" @submit.prevent="handleSubmit">
+        <div class="form-group">
+          <label class="form-label">Activity Name</label>
+          <input
+            type="text"
+            v-model="form.name"
+            class="form-input"
+            placeholder="Go for walk" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Activity Points</label>
+          <input
+            type="number"
+            v-model="form.points"
+            class="form-input"
+            min="1"
+            max="100"
+            placeholder="10"
+            @input="validatePoints" />
+        </div>
+
+        <button class="submit-button" :disabled="!isValid">
+          Add Activity
+        </button>
+      </form>
+    </div>
   </Dialog>
 </template>
 
@@ -89,37 +109,50 @@ function handleSubmit() {
 </script>
 
 <style scoped>
-.dialog-container {
-  width: 90vw;
-  max-width: 500px;
-}
-
-.dialog-container :deep(.p-dialog-header) {
-  padding: 1.5rem;
-  background-color: rgb(250 251 231);
-}
-
-.dialog-container :deep(.p-dialog-content) {
-  padding: 0 1.5rem 1.5rem;
-  background-color: rgb(250 251 231);
-}
-
-.dialog-container :deep(.p-dialog-footer) {
-  padding: 1.5rem;
-  background-color: rgb(250 251 231);
+.dialog-wrapper {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  background-color: rgb(250 251 231);
+  position: relative;
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  padding: 2rem;
+}
+
+.dialog-enter-active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.close-button-container {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10;
+}
+
+.close-button {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  border-radius: 50% !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
 }
 
 .dialog-title {
-  color: #232323;
+  margin-top: 2rem;
   font-size: 1.5rem;
   font-weight: 500;
-  margin: 0;
+  color: #232323;
+  margin-bottom: 2rem;
 }
 
 .activity-form {
-  margin-top: 1rem;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 .form-group {
@@ -169,5 +202,24 @@ function handleSubmit() {
 .submit-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+:deep(.p-dialog-mask) {
+  background-color: rgb(250 251 231);
+}
+
+:deep(.p-dialog) {
+  margin: 0;
+  color: #232323;
+  overflow: visible;
+  height: 100vh;
+  max-height: 100vh;
+  border-radius: 0;
+}
+
+:deep(.p-dialog-content) {
+  padding: 0;
+  background-color: rgb(250 251 231);
+  overflow: visible !important;
 }
 </style>

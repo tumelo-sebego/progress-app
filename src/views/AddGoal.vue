@@ -4,6 +4,12 @@
       <h1 class="greeting-title">Ola, {{ userName }}</h1>
       <div class="no-goals-card">
         <p class="no-goals-text">You have no goals currently setup</p>
+        <div class="progress-section">
+          <span class="progress-percentage">{{ totalPoints }}%</span>
+          <div class="progress-bar-container">
+            <div class="progress-bar" :style="{ width: `${totalPoints}%` }"></div>
+          </div>
+        </div>
       </div>
       <button class="setup-button" @click="startCreateGoal">Set up Goal</button>
 
@@ -73,7 +79,12 @@
           :key="activity.name"
           class="activity-item">
           <span class="activity-name">{{ activity.name }}</span>
-          <span class="activity-points">{{ activity.points }}%</span>
+          <div class="activity-right">
+            <span class="activity-points">{{ activity.points }}%</span>
+            <button class="delete-button" @click="deleteActivity(activity)">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -96,7 +107,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { supabase } from "@/supabase/config";
 import Navbar from "../components/Navbar.vue";
 import NewActivityDialog from "../components/NewActivityDialog.vue";
@@ -111,6 +122,11 @@ const goalForm = ref({
 });
 const showDialog = ref(false);
 const activities = ref([]);
+
+// Add computed property for total points
+const totalPoints = computed(() => {
+  return activities.value.reduce((sum, activity) => sum + activity.points, 0);
+});
 
 onMounted(async () => {
   const {
@@ -146,6 +162,10 @@ function goBackToGoalForm() {
 
 function handleAddActivity(activity) {
   activities.value.push(activity);
+}
+
+function deleteActivity(activity) {
+  activities.value = activities.value.filter(a => a !== activity);
 }
 </script>
 
@@ -407,5 +427,63 @@ function handleAddActivity(activity) {
 .activity-points {
   color: #232323;
   font-weight: 600;
+}
+
+.activity-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.delete-button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #50a65d;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.2s ease;
+}
+
+.delete-button:hover {
+  background-color: #458f51;
+}
+
+.delete-button .material-icons {
+  font-size: 18px;
+}
+
+.progress-section {
+  margin-top: 1rem;
+  text-align: left;
+  padding: 0 1rem;
+}
+
+.progress-percentage {
+  color: #232323;
+  font-size: 1rem;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: #ffffff;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #50a65d;
+  border-radius: 4px;
+  transition: width 0.3s ease;
 }
 </style>

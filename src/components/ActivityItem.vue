@@ -40,6 +40,12 @@
           </span>
         </template>
       </div>
+      <!-- Delete button -->
+      <Button
+        icon="pi pi-times"
+        class="delete-button"
+        @click.stop="$emit('delete-activity', activity.id)"
+        text />
     </div>
 
     <Dialog
@@ -155,6 +161,8 @@ watch(
 onUnmounted(() => {
   stopBlinking();
 });
+
+defineEmits(["open-dialog", "delete-activity"]);
 </script>
 
 <style scoped>
@@ -167,11 +175,12 @@ onUnmounted(() => {
 }
 
 .activity-content {
+  position: relative;
+  padding-right: 3rem;
+  width: 100%;
   display: flex;
-  justify-content: flex-start;
   align-items: center;
-  min-height: 3.5rem;
-  padding: 0 0.5rem;
+  justify-content: space-between;
 }
 
 .activity-info {
@@ -435,5 +444,27 @@ onUnmounted(() => {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Subtle shadow */
   color: #232323; /* Text color */
   margin: 0 auto; /* Center the circle */
+}
+
+.delete-button {
+  position: absolute !important;
+  right: 0.5rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  border-radius: 50% !important;
+  background-color: rgba(35, 35, 35, 0.1) !important;
+  color: #232323 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.delete-button:hover {
+  background-color: #bf2f91 !important;
+  color: white !important;
 }
 </style>

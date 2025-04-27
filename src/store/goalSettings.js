@@ -106,6 +106,23 @@ export const useGoalSettingsStore = defineStore("goalSettings", {
       }
     },
 
+    async getLatestActiveGoal() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return null;
+      const today = new Date().toISOString().split("T")[0];
+      const { data, error } = await supabase
+        .from("goals")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("end_date", today)
+        .order("end_date", { ascending: true });
+      if (error || !data || data.length === 0) return null;
+      // Get the goal with the soonest end_date in the future
+      return data[0];
+    },
+
     setCurrentGoal(goal) {
       this.currentGoal = goal;
     },

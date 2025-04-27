@@ -132,7 +132,12 @@ const hasActiveGoal = ref(false);
 const activeGoal = ref(null);
 
 const latestActivities = computed(() => {
-  return store.getLatestActivities;
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+  const todayStr = `${yyyy}-${mm}-${dd}`;
+  return store.getActivitiesByDate(todayStr) || [];
 });
 
 const dialogVisible = ref(false);

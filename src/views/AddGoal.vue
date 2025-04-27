@@ -221,9 +221,8 @@ async function handleDone() {
     const goalData = {
       title: goalForm.value.name,
       start_date: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-      totalDays: days,
-      totalPoints: totalPoints.value,
+      end_date: endDate.toISOString(),
+      total_days: days,
       created_at: new Date().toISOString(),
     };
     const newGoal = await goalStore.addGoal(goalData);

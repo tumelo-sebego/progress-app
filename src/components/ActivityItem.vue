@@ -41,11 +41,6 @@
         </template>
       </div>
       <!-- Delete button -->
-      <Button
-        icon="pi pi-times"
-        class="delete-button"
-        @click.stop="$emit('delete-activity', activity.id)"
-        text />
     </div>
 
     <Dialog
@@ -98,7 +93,7 @@
 import { ref, computed, onUnmounted, watch, defineProps } from "vue";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
-import { useActivitiesStore } from "@/store/activities";
+import { useActivityStore } from "@/store/activities";
 
 const props = defineProps({
   id: {
@@ -107,7 +102,7 @@ const props = defineProps({
   },
 });
 
-const store = useActivitiesStore();
+const store = useActivityStore();
 const activity = computed(() => store.getActivityById(props.id));
 
 const dialogVisible = ref(false);
@@ -176,7 +171,6 @@ defineEmits(["open-dialog", "delete-activity"]);
 
 .activity-content {
   position: relative;
-  padding-right: 3rem;
   width: 100%;
   display: flex;
   align-items: center;

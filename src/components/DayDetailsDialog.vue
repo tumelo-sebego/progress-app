@@ -67,7 +67,7 @@
 import { ref, computed, defineProps, defineEmits } from "vue";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
-import { useActivitiesStore } from "@/store/activities";
+import { useActivityStore } from "@/store/activities";
 import ActivityItem from "./ActivityItem.vue";
 import ProgressCircle from "./ProgressCircle.vue";
 import ActivityTimer from "./ActivityTimer.vue";
@@ -84,7 +84,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:visible"]);
-const store = useActivitiesStore();
+const store = useActivityStore();
 
 const activityDialogVisible = ref(false);
 const selectedActivityId = ref(null);

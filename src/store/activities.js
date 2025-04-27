@@ -50,6 +50,10 @@ export const useActivityStore = defineStore("activityStore", {
         return activityDate >= today && activityDate < tomorrow;
       });
     },
+
+    getActivityById: (state) => (id) => {
+      return state.activities.find((activity) => activity.id === id);
+    },
   },
 
   actions: {
@@ -178,7 +182,6 @@ export const useActivityStore = defineStore("activityStore", {
         await this.fetchActivities();
       } catch (error) {
         console.error("Error completing activity:", error.message);
-        throw error;
       }
     },
 
@@ -193,7 +196,6 @@ export const useActivityStore = defineStore("activityStore", {
         await this.fetchActivities();
       } catch (error) {
         console.error("Error deleting activity:", error.message);
-        throw error;
       }
     },
 

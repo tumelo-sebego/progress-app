@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <h1 class="user-greeting">Ola,{{ name }}</h1>
+    <h1 class="user-greeting">Ola, {{ name }}</h1>
     <p class="date">{{ date }}</p>
   </header>
 </template>

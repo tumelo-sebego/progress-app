@@ -1,8 +1,16 @@
 <script setup>
-import { ref, computed, onUnmounted, onMounted, watch, defineProps, defineEmits } from "vue";
+import {
+  ref,
+  computed,
+  onUnmounted,
+  onMounted,
+  watch,
+  defineProps,
+  defineEmits,
+} from "vue";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
-import { useActivitiesStore } from "@/store/activities";
+import { useActivityStore } from "@/store/activities";
 
 const props = defineProps({
   id: {
@@ -15,7 +23,7 @@ const props = defineProps({
   },
 });
 
-const store = useActivitiesStore();
+const store = useActivityStore();
 const activity = computed(() => store.getActivityById(props.id));
 // const elapsedTime = ref(activity.value.duration || 0);
 

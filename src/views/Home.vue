@@ -33,67 +33,6 @@
             :id="selectedActivityId"
             @active-state="handleActiveState" />
         </template>
-
-        <template v-else-if="activeTab === 'calendar'">
-          <div class="progress-view-container">
-            <h2 class="section-title">Progress View</h2>
-
-            <div class="progress-buttons-container">
-              <Button
-                class="progress-button"
-                :class="
-                  activeProgressType === 'daily'
-                    ? 'active-button'
-                    : 'inactive-button'
-                "
-                @click="handleProgressTypeChange('daily')">
-                <i class="pi pi-bolt icon-spacing"></i>
-                <span>Daily Progress</span>
-              </Button>
-
-              <Button
-                class="progress-button"
-                :class="
-                  activeProgressType === 'weekly'
-                    ? 'active-button'
-                    : 'inactive-button'
-                "
-                @click="handleProgressTypeChange('weekly')">
-                <i class="pi pi-star icon-spacing"></i>
-                <span>Weekly Progress</span>
-              </Button>
-
-              <Button
-                class="progress-button"
-                :class="
-                  activeProgressType === 'monthly'
-                    ? 'active-button'
-                    : 'inactive-button'
-                "
-                @click="handleProgressTypeChange('monthly')">
-                <i class="pi pi-trophy icon-spacing"></i>
-                <span>Monthly Progress</span>
-              </Button>
-            </div>
-
-            <div class="progress-message">
-              <p>
-                {{ progressTypeMessage }}
-              </p>
-            </div>
-          </div>
-        </template>
-
-        <template v-else-if="activeTab === 'profile'">
-          <div class="profile-container">
-            <div class="profile-content">
-              <h2 class="section-title">User Profile</h2>
-              <p class="secondary-text">
-                Your profile information will appear here
-              </p>
-            </div>
-          </div>
-        </template>
       </div>
 
       <Navbar
@@ -115,7 +54,6 @@ import ProgressCircle from "@/components/ProgressCircle.vue";
 import ActivityItem from "@/components/ActivityItem.vue";
 import Navbar from "@/components/Navbar.vue";
 import ActivityTimer from "@/components/ActivityTimer.vue";
-import Button from "primevue/button";
 import { supabase } from "@/supabase/config";
 
 const router = useRouter();
@@ -161,19 +99,6 @@ function getOrdinalSuffix(day) {
       return "th";
   }
 }
-
-const progressTypeMessage = computed(() => {
-  switch (activeProgressType.value) {
-    case "daily":
-      return "Your daily progress stats will appear here";
-    case "weekly":
-      return "Your weekly progress summary will appear here";
-    case "monthly":
-      return "Your monthly achievements will appear here";
-    default:
-      return "";
-  }
-});
 
 const checkAuth = async () => {
   const {
@@ -228,6 +153,13 @@ onMounted(async () => {
 
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
+    // Fetch the user's name from Supabase Auth
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user?.user_metadata?.full_name) {
+      username.value = user.user_metadata.full_name;
+    }
     await checkActiveGoal();
     if (hasActiveGoal.value) {
       await loadTasks();

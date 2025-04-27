@@ -80,13 +80,13 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useGoalSettingsStore } from "@/store/goalSettings";
-import { useActivitiesStore } from "@/store/activities"; // Add this import
+import { useActivityStore } from "@/store/activities"; // Add this import
 import ProgressCircle from "@/components/ProgressCircle.vue";
 import Navbar from "@/components/Navbar.vue";
 import Chart from "primevue/chart";
 
 const goalStore = useGoalSettingsStore();
-const store = useActivitiesStore(); // Add this line
+const store = useActivityStore(); // Add this line
 const contentContainer = ref(null);
 const isHeaderHidden = ref(false);
 let lastScrollPosition = 0;

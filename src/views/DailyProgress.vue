@@ -39,14 +39,14 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { useActivitiesStore } from "@/store/activities";
+import { useActivityStore } from "@/store/activities";
 import { useGoalSettingsStore } from "@/store/goalSettings";
 import DayItem from "@/components/DayItem.vue";
 import Navbar from "@/components/Navbar.vue";
 import ActivityTimer from "@/components/ActivityTimer.vue";
 import DayDetailsDialog from "@/components/DayDetailsDialog.vue";
 
-const store = useActivitiesStore();
+const store = useActivityStore();
 const goalStore = useGoalSettingsStore();
 const dialogVisible = ref(false);
 const selectedActivityId = ref(null);

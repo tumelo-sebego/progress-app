@@ -34,13 +34,13 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { useActivitiesStore } from "@/store/activities";
+import { useActivityStore } from "@/store/activities";
 import { useGoalSettingsStore } from "@/store/goalSettings";
 import WeekItem from "@/components/WeekItem.vue";
 import Navbar from "@/components/Navbar.vue";
 import WeekDetailsDialog from "@/components/WeekDetailsDialog.vue";
 
-const store = useActivitiesStore();
+const store = useActivityStore();
 const goalStore = useGoalSettingsStore();
 const contentContainer = ref(null);
 const isHeaderHidden = ref(false);

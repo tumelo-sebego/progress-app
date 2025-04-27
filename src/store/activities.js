@@ -89,6 +89,26 @@ export const useActivityStore = defineStore("activityStore", {
       }
     },
 
+    async fetchActivitiesForGoal(goalId) {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) throw new Error("No user logged in");
+        const { data, error } = await supabase
+          .from("activities")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("goal_id", goalId)
+          .order("created_at", { ascending: true });
+        if (error) throw error;
+        this.activities = data;
+        this.calculateProgress();
+      } catch (error) {
+        console.error("Error fetching activities for goal:", error.message);
+      }
+    },
+
     async addActivity(activityData) {
       try {
         const {

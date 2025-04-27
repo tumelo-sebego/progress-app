@@ -129,6 +129,7 @@ const activeTab = ref("home");
 const date = ref("");
 const activeProgressType = ref("daily");
 const hasActiveGoal = ref(false);
+const activeGoal = ref(null);
 
 const latestActivities = computed(() => {
   return store.getLatestActivities;
@@ -181,11 +182,8 @@ const checkAuth = async () => {
 };
 
 const loadTasks = async () => {
-  try {
-    await store.fetchActivities();
-  } catch (error) {
-    console.error("Error loading tasks:", error);
-  }
+  if (!activeGoal.value) return;
+  await store.fetchActivitiesForGoal(activeGoal.value.id);
 };
 
 const handleNavigate = (tab) => {
@@ -203,9 +201,8 @@ const progress = computed(() => {
 });
 
 const checkActiveGoal = async () => {
-  const activeGoal = await goalStore.checkActiveGoal();
-  hasActiveGoal.value = !!activeGoal;
-
+  activeGoal.value = await goalStore.getLatestActiveGoal();
+  hasActiveGoal.value = !!activeGoal.value;
   if (!hasActiveGoal.value) {
     router.push("/add-goal");
   }

@@ -30,6 +30,15 @@
         </div>
 
         <div class="form-group">
+          <label class="form-label">When do you want to start?</label>
+          <input
+            type="date"
+            v-model="goalForm.startDate"
+            class="form-input"
+            :min="new Date().toISOString().split('T')[0]" />
+        </div>
+
+        <div class="form-group">
           <label class="form-label">How many days to complete goal</label>
           <input
             type="number"
@@ -48,7 +57,7 @@
           <span class="back-text">Back</span>
         </button>
 
-        <button v-if="isValidDays" class="next-button" @click="handleNext">
+        <button v-if="isValidForm" class="next-button" @click="handleNext">
           <span class="next-text">Next</span>
           <span class="material-icons">chevron_right</span>
         </button>
@@ -133,6 +142,7 @@ const showActivities = ref(false);
 const goalForm = ref({
   name: "",
   days: "",
+  startDate: new Date().toISOString().split("T")[0], // Today's date as default
 });
 const showDialog = ref(false);
 const activities = ref([]);
@@ -141,6 +151,16 @@ const isLoading = ref(false);
 // Add computed property for total points
 const totalPoints = computed(() => {
   return activities.value.reduce((sum, activity) => sum + activity.points, 0);
+});
+
+// Add new validation
+const isValidForm = computed(() => {
+  const days = Number(goalForm.value.days);
+  const startDate = new Date(goalForm.value.startDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return days >= 1 && days <= 30 && startDate >= today;
 });
 
 onMounted(async () => {
@@ -166,7 +186,7 @@ function validateDays() {
 }
 
 function handleNext() {
-  if (isValidDays.value) {
+  if (isValidForm.value) {
     showActivities.value = true;
   }
 }
@@ -343,6 +363,17 @@ async function handleDone() {
 .form-input:focus {
   outline: none;
   box-shadow: 0 0 0 2px #50a65d;
+}
+
+.form-input[type="date"] {
+  appearance: none;
+  padding: 0.75rem 1rem;
+  color: #232323;
+}
+
+.form-input[type="date"]::-webkit-calendar-picker-indicator {
+  background-color: transparent;
+  cursor: pointer;
 }
 
 .bottom-buttons {

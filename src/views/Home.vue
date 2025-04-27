@@ -124,7 +124,7 @@ const goalStore = useGoalSettingsStore();
 
 const isInitialized = ref(false);
 const forceShow = ref(false);
-const username = ref("Tumelo");
+const username = ref("");
 const activeTab = ref("home");
 const date = ref("");
 const activeProgressType = ref("daily");

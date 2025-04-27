@@ -134,6 +134,9 @@ import { ref, onMounted, computed } from "vue";
 import { supabase } from "@/supabase/config";
 import Navbar from "../components/Navbar.vue";
 import NewActivityDialog from "../components/NewActivityDialog.vue";
+import { useGoalSettingsStore } from "@/store/goalSettings";
+import { useActivityStore } from "@/store/activities";
+import { useRouter } from "vue-router";
 
 const userName = ref("");
 const isCreateMode = ref(false);
@@ -147,6 +150,10 @@ const goalForm = ref({
 const showDialog = ref(false);
 const activities = ref([]);
 const isLoading = ref(false);
+
+const goalStore = useGoalSettingsStore();
+const activityStore = useActivityStore();
+const router = useRouter();
 
 // Add computed property for total points
 const totalPoints = computed(() => {
@@ -205,8 +212,48 @@ function deleteActivity(activity) {
 
 async function handleDone() {
   isLoading.value = true;
-  // Add your logic here to save goals and activities
-  // Then redirect to home or another view
+  try {
+    // 1. Create the goal
+    const days = Number(goalForm.value.days);
+    const startDate = new Date(goalForm.value.startDate);
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + days - 1);
+    const goalData = {
+      title: goalForm.value.name,
+      start_date: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      totalDays: days,
+      totalPoints: totalPoints.value,
+      created_at: new Date().toISOString(),
+    };
+    const newGoal = await goalStore.addGoal(goalData);
+
+    // 2. Prepare all activities for bulk insert
+    const activitiesToInsert = [];
+    for (let i = 0; i < days; i++) {
+      const activityDate = new Date(startDate);
+      activityDate.setDate(startDate.getDate() + i);
+      for (const template of activities.value) {
+        activitiesToInsert.push({
+          title: template.name,
+          points: template.points,
+          completed: false,
+          created_at: activityDate.toISOString(),
+          goal_id: newGoal.id,
+          status: "pending",
+        });
+      }
+    }
+    // 3. Bulk insert all activities
+    await activityStore.addActivities(activitiesToInsert);
+    // 4. Redirect to home
+    router.push("/");
+  } catch (error) {
+    console.error("Error setting up goal and activities:", error);
+    alert("Failed to set up goal and activities. Please try again.");
+  } finally {
+    isLoading.value = false;
+  }
 }
 </script>
 

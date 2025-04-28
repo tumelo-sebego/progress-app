@@ -83,7 +83,6 @@ const goalItems = ref([
 
 // Function to determine if a tab is active
 function isTabActive(tabId) {
-  console.log("Checking active tab:", tabId, activeTab.value);
   if (tabId === "calendar") {
     return isGoalsMenuOpen.value || route.path.includes("progress");
   }

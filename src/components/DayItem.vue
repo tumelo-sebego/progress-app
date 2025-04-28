@@ -19,7 +19,7 @@
 
 <script setup>
 import { computed, defineProps, defineEmits } from "vue";
-import { useActivitiesStore } from "@/store/activities";
+import { useActivityStore } from "@/store/activities";
 
 const props = defineProps({
   activityDate: {
@@ -30,7 +30,7 @@ const props = defineProps({
 
 defineEmits(["show-details"]);
 
-const store = useActivitiesStore();
+const store = useActivityStore();
 
 // Get activities for this day using getActivitiesByDate
 const dayActivities = computed(() => {

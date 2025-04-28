@@ -128,11 +128,16 @@ const checkActiveGoal = async () => {
 };
 
 onMounted(async () => {
-  // Start 3 second timeout
-  setTimeout(() => {
+  let timeoutId;
+  if (!appStore.isAppInitialized) {
+    // Start 3 second timeout
+    timeoutId = setTimeout(() => {
+      forceShow.value = true;
+    }, 3000);
+  } else {
+    console.log("App already initialized, no need to wait.");
     forceShow.value = true;
-  }, 3000);
-
+  }
   // Format current date
   const today = new Date();
   const day = today.getDate();
@@ -154,7 +159,12 @@ onMounted(async () => {
       await loadTasks();
     }
   }
-  if (!appStore.isAppInitialized) appStore.isAppInitialized = true;
+  if (!appStore.isAppInitialized) {
+    appStore.isAppInitialized = true;
+  }
+
+  // Hide loading as soon as initialized
+  if (timeoutId) clearTimeout(timeoutId);
 });
 
 const shouldShowContent = computed(() => {

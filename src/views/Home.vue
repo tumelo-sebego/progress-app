@@ -58,7 +58,6 @@ const router = useRouter();
 const store = useActivityStore();
 const goalStore = useGoalSettingsStore();
 
-const isInitialized = ref(false);
 const forceShow = ref(false);
 const username = ref("");
 const activeTab = ref("home");
@@ -155,7 +154,7 @@ onMounted(async () => {
       await loadTasks();
     }
   }
-  isInitialized.value = true;
+  if (!appStore.isAppInitialized) appStore.isAppInitialized = true;
 });
 
 const shouldShowContent = computed(() => {

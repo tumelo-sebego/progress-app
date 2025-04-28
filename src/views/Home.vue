@@ -109,10 +109,11 @@ const progress = computed(() => {
 });
 
 const checkActiveGoal = async () => {
-  activeGoal.value = await goalStore.getLatestActiveGoal();
-  hasActiveGoal.value = !!activeGoal.value;
-  goalStore.hasActiveGoal = hasActiveGoal.value; // Sync with store for Navbar
-  if (!hasActiveGoal.value) {
+  if (!goalStore.activeGoal) {
+    const goal = await goalStore.getLatestActiveGoal();
+    goalStore.setActiveGoal(goal);
+  }
+  if (!goalStore.hasActiveGoal) {
     router.push("/add-goal");
   }
 };
@@ -155,21 +156,17 @@ onMounted(async () => {
     forceShow.value = false;
   } else {
     // Already initialized, just show content immediately
-    console.log("App already initialized, showing content immediately.");
     forceShow.value = true;
-    // Optionally, update username from store
     if (appStore.user?.user_metadata?.full_name) {
       username.value = appStore.user.user_metadata.full_name;
     }
 
-    console.log("activeGoal is: ", activeGoal.value);
-    console.log("hasActiveGoal is: ", hasActiveGoal.value);
-    // Ensure activeGoal and activities are loaded
-    if (!activeGoal.value) {
+    // Use stored activeGoal, only fetch if missing
+    if (!goalStore.activeGoal) {
       await checkActiveGoal();
     }
     if (
-      hasActiveGoal.value &&
+      goalStore.hasActiveGoal &&
       (!store.activities.length || !latestActivities.value.length)
     ) {
       await loadTasks();

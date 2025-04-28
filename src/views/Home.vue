@@ -96,17 +96,6 @@ function getOrdinalSuffix(day) {
   }
 }
 
-const checkAuth = async () => {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    router.push("/login");
-    return false;
-  }
-  return true;
-};
-
 const loadTasks = async () => {
   if (!activeGoal.value) return;
   await store.fetchActivitiesForGoal(activeGoal.value.id);
@@ -128,16 +117,6 @@ const checkActiveGoal = async () => {
 };
 
 onMounted(async () => {
-  let timeoutId;
-  if (!appStore.isAppInitialized) {
-    // Start 3 second timeout
-    timeoutId = setTimeout(() => {
-      forceShow.value = true;
-    }, 3000);
-  } else {
-    console.log("App already initialized, no need to wait.");
-    forceShow.value = true;
-  }
   // Format current date
   const today = new Date();
   const day = today.getDate();
@@ -145,26 +124,42 @@ onMounted(async () => {
   const month = today.toLocaleDateString("en-US", { month: "long" });
   date.value = `${weekday}, ${month} ${day}${getOrdinalSuffix(day)}`;
 
-  const isAuthenticated = await checkAuth();
-  if (isAuthenticated) {
-    // Fetch the user's name from Supabase Auth
+  let timeoutId;
+  if (!appStore.isAppInitialized) {
+    // Start 3 second timeout
+    timeoutId = setTimeout(() => {
+      forceShow.value = true;
+    }, 3000);
+
+    // Only fetch user/auth info if not already initialized
     const {
       data: { user },
     } = await supabase.auth.getUser();
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    appStore.user = user;
     if (user?.user_metadata?.full_name) {
       username.value = user.user_metadata.full_name;
     }
+
     await checkActiveGoal();
     if (hasActiveGoal.value) {
       await loadTasks();
     }
-  }
-  if (!appStore.isAppInitialized) {
-    appStore.isAppInitialized = true;
-  }
 
-  // Hide loading as soon as initialized
-  if (timeoutId) clearTimeout(timeoutId);
+    appStore.isAppInitialized = true;
+    if (timeoutId) clearTimeout(timeoutId);
+    forceShow.value = false;
+  } else {
+    // Already initialized, just show content immediately
+    forceShow.value = true;
+    // Optionally, update username from store
+    if (appStore.user?.user_metadata?.full_name) {
+      username.value = appStore.user.user_metadata.full_name;
+    }
+  }
 });
 
 const shouldShowContent = computed(() => {

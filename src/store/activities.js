@@ -203,6 +203,28 @@ export const useActivityStore = defineStore("activityStore", {
       this.currentActivity = activity;
     },
 
+    async startActivity(activityId) {
+      try {
+        this.activities.forEach((activity) => {
+          if (activity.id === activityId) {
+            this.currentActivity = activity;
+          }
+        });
+        // Set this activity to active and set timeActive
+        const { error } = await supabase
+          .from("activities")
+          .update({
+            status: "active",
+            timeActive: new Date().toISOString(),
+          })
+          .eq("id", activityId);
+
+        if (error) throw error;
+      } catch (error) {
+        console.error("Error starting activity:", error.message);
+      }
+    },
+
     calculateProgress() {
       const dailyActivities = this.getDailyActivities;
       if (dailyActivities.length === 0) {

@@ -4,7 +4,7 @@ import { supabase } from "@/supabase/config";
 export const useGoalSettingsStore = defineStore("goalSettings", {
   state: () => ({
     goals: [],
-    currentGoal: null,
+    activeGoal: null,
     hasActiveGoal: false,
   }),
 
@@ -122,8 +122,9 @@ export const useGoalSettingsStore = defineStore("goalSettings", {
       return data[0];
     },
 
-    setCurrentGoal(goal) {
-      this.currentGoal = goal;
+    setActiveGoal(goal) {
+      this.activeGoal = goal;
+      this.hasActiveGoal = !!goal;
     },
   },
 });

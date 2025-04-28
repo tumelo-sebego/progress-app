@@ -51,7 +51,9 @@ import ActivityItem from "@/components/ActivityItem.vue";
 import Navbar from "@/components/Navbar.vue";
 import ActivityTimer from "@/components/ActivityTimer.vue";
 import { supabase } from "@/supabase/config";
+import { useAppStore } from "@/store/app";
 
+const appStore = useAppStore();
 const router = useRouter();
 const store = useActivityStore();
 const goalStore = useGoalSettingsStore();
@@ -157,7 +159,7 @@ onMounted(async () => {
 });
 
 const shouldShowContent = computed(() => {
-  return isInitialized.value || forceShow.value;
+  return appStore.isAppInitialized || forceShow.value;
 });
 </script>
 

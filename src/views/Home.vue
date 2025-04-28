@@ -62,8 +62,9 @@ const forceShow = ref(false);
 const username = ref("");
 const activeTab = ref("home");
 const date = ref("");
-const hasActiveGoal = ref(false);
-const activeGoal = ref(null);
+
+const activeGoal = computed(() => goalStore.activeGoal);
+const hasActiveGoal = computed(() => goalStore.hasActiveGoal);
 
 const latestActivities = computed(() => {
   const today = new Date();

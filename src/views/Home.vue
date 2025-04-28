@@ -35,11 +35,7 @@
         </template>
       </div>
 
-      <Navbar
-        :active="activeTab"
-        :active-goal="activeProgressType"
-        @navigate="handleNavigate"
-        @goal-select="handleProgressTypeChange" />
+      <Navbar :active="activeTab" />
     </div>
   </div>
 </template>
@@ -65,7 +61,6 @@ const forceShow = ref(false);
 const username = ref("");
 const activeTab = ref("home");
 const date = ref("");
-const activeProgressType = ref("daily");
 const hasActiveGoal = ref(false);
 const activeGoal = ref(null);
 
@@ -116,14 +111,6 @@ const loadTasks = async () => {
   await store.fetchActivitiesForGoal(activeGoal.value.id);
 };
 
-const handleNavigate = (tab) => {
-  activeTab.value = tab;
-};
-
-const handleProgressTypeChange = (type) => {
-  activeProgressType.value = type;
-};
-
 const progress = computed(() => {
   return latestActivities.value
     .filter((activity) => activity.status === "done")
@@ -133,6 +120,7 @@ const progress = computed(() => {
 const checkActiveGoal = async () => {
   activeGoal.value = await goalStore.getLatestActiveGoal();
   hasActiveGoal.value = !!activeGoal.value;
+  goalStore.hasActiveGoal = hasActiveGoal.value; // Sync with store for Navbar
   if (!hasActiveGoal.value) {
     router.push("/add-goal");
   }

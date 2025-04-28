@@ -92,7 +92,6 @@ export const useGoalSettingsStore = defineStore("goalSettings", {
           .from("goals")
           .select("*")
           .eq("user_id", user.id)
-          .eq("status", "active")
           .gt("end_date", currentDate)
           .single();
 

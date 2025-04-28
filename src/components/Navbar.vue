@@ -46,6 +46,10 @@ const router = useRouter();
 const route = useRoute();
 const goalStore = useGoalSettingsStore();
 
+const props = defineProps({
+  active: String,
+});
+
 // State to track the active tab and active goal
 const activeTab = ref(""); // Default to no active tab
 const activeGoal = ref(""); // Default to no active goal
@@ -79,11 +83,22 @@ const goalItems = ref([
 
 // Function to determine if a tab is active
 function isTabActive(tabId) {
+  console.log("Checking active tab:", tabId, activeTab.value);
   if (tabId === "calendar") {
-    // The "Goals" tab is active if the submenu is open or a goal view is displayed
     return isGoalsMenuOpen.value || route.path.includes("progress");
   }
-  return activeTab.value === tabId && !isGoalsMenuOpen.value;
+  if (tabId === "home") {
+    return (
+      props.active === "home" ||
+      route.path === "/" ||
+      route.path === "" ||
+      route.path === "/home"
+    );
+  }
+  if (tabId === "add-goal") {
+    return props.active === "add-goal" || route.path === "/add-goal";
+  }
+  return props.active === tabId && !isGoalsMenuOpen.value;
 }
 
 // Function to handle navigation for main tabs
@@ -164,6 +179,7 @@ function handleAnimationEnd() {
 // Initialize the active tab based on the current route
 onMounted(() => {
   if (route.path === "/") {
+    console.log("Home route detected");
     activeTab.value = "home"; // Default to "Home" tab
   } else if (route.path.includes("progress")) {
     activeTab.value = "calendar"; // Default to "Goals" tab if a submenu view is active

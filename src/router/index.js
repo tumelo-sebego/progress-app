@@ -75,10 +75,16 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  const appStore = useAppStore();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+
+  // Store the route before any redirects
+  if (to.path !== "/login" && to.path !== "/register") {
+    appStore.setLastRoute(to.fullPath);
+  }
 
   if (requiresAuth && !user) {
     next("/login");
@@ -91,15 +97,6 @@ router.beforeEach(async (to, from, next) => {
   } else {
     next();
   }
-});
-
-router.beforeEach((to, from, next) => {
-  const appStore = useAppStore();
-
-  // Store the current route
-  appStore.setLastRoute(to.fullPath);
-
-  next();
 });
 
 export default router;

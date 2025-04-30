@@ -68,30 +68,19 @@ export const useActivityStore = defineStore("activityStore", {
 
     async fetchActivities(dateRange = null) {
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (!user) throw new Error("No user logged in");
-
-        let query = supabase
-          .from("activities")
-          .select("*")
-          .eq("user_id", user.id);
-
         if (dateRange) {
-          query = query
-            .gte("created_at", dateRange.start.toISOString())
-            .lt("created_at", dateRange.end.toISOString());
+          // Filter existing activities by date range
+          this.activities = this.activities.filter((activity) => {
+            const activityDate = new Date(activity.created_at);
+            return (
+              activityDate >= dateRange.start && activityDate < dateRange.end
+            );
+          });
         }
-
-        const { data, error } = await query.order("created_at", {
-          ascending: false,
-        });
-        if (error) throw error;
-        this.activities = data;
+        // Calculate progress with filtered or all activities
         this.calculateProgress();
       } catch (error) {
-        console.error("Error fetching activities:", error.message);
+        console.error("Error filtering activities:", error.message);
       }
     },
 

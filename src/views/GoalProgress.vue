@@ -20,7 +20,7 @@
         ref="contentContainer">
         <!-- Progress Circle -->
         <div class="progress-container">
-          <ProgressCircle :progress="activeGoal?.completionRate || 0" />
+          <ProgressCircle :progress="completionRate" />
         </div>
 
         <!-- Days Left Container -->
@@ -47,7 +47,7 @@
             <span class="vertical-line"></span>
             <div class="points-count">
               <span class="count-value"
-                >{{ activeGoal?.totalPoints || 0 }}/{{ possiblePoints }}</span
+                >{{ totalPoints }}/{{ possiblePoints }}</span
               >
             </div>
           </div>
@@ -91,14 +91,13 @@ const contentContainer = ref(null);
 const isHeaderHidden = ref(false);
 let lastScrollPosition = 0;
 
-const activeGoal = computed(() => goalStore.getActiveGoal);
+const activeGoal = computed(() => goalStore.activeGoal);
 
 // Calculate days left until goal completion
 const daysLeft = computed(() => {
-  console.log("activeGoal.value", activeGoal.value);
-  if (!activeGoal.value?.endDate) return 0;
+  if (!activeGoal.value?.end_date) return 0;
 
-  const endDate = new Date(activeGoal.value.endDate);
+  const endDate = new Date(activeGoal.value.end_date);
   const today = new Date();
   const diffTime = endDate - today;
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -109,7 +108,7 @@ const daysLeft = computed(() => {
 // Add computed property for possible points
 const possiblePoints = computed(() => {
   if (!activeGoal.value) return 0;
-  return activeGoal.value.totalDays * 100; // Each day can earn 100 points
+  return activeGoal.value.total_days * 100; // Each day can earn 100 points
 });
 
 function handleScroll(event) {
@@ -125,8 +124,8 @@ function handleScroll(event) {
 const chartData = computed(() => {
   if (!activeGoal.value) return null;
 
-  const startDate = new Date(activeGoal.value.firstActiveDate);
-  const endDate = new Date(activeGoal.value.endDate);
+  const startDate = new Date(activeGoal.value.start_date);
+  const endDate = new Date(activeGoal.value.end_date);
   const days = [];
   const points = [];
 
@@ -199,10 +198,10 @@ const impressionData = computed(() => {
   // Get recent activities (last 3 days including today)
   const today = new Date();
   const threeDaysAgo = new Date(today);
-  threeDaysAgo.setDate(today.getDate() - 2); // -2 to include today
+  threeDaysAgo.setDate(today.getDate() - 2);
 
   const recentActivities = store.activities.filter((activity) => {
-    const activityDate = new Date(activity.dateCreated);
+    const activityDate = new Date(activity.created_at);
     return (
       activityDate >= threeDaysAgo &&
       activityDate <= today &&
@@ -213,7 +212,7 @@ const impressionData = computed(() => {
   // Calculate recent trend
   const recentDailyPoints = {};
   recentActivities.forEach((activity) => {
-    const date = new Date(activity.dateCreated).toDateString();
+    const date = new Date(activity.created_at).toDateString();
     recentDailyPoints[date] = (recentDailyPoints[date] || 0) + activity.points;
   });
 
@@ -257,6 +256,21 @@ const impressionData = computed(() => {
 
 const impressionColorClass = computed(() => impressionData.value.color);
 const impressionText = computed(() => impressionData.value.text);
+
+// Add total points calculation if missing
+const totalPoints = computed(() => {
+  if (!activeGoal.value) return 0;
+  return store.activities
+    .filter((activity) => activity.status === "done")
+    .reduce((sum, activity) => sum + activity.points, 0);
+});
+
+// Add completion rate calculation if missing
+const completionRate = computed(() => {
+  if (!activeGoal.value) return 0;
+  const maxPoints = possiblePoints.value;
+  return maxPoints ? Math.round((totalPoints.value / maxPoints) * 100) : 0;
+});
 </script>
 
 <style scoped>

@@ -57,11 +57,11 @@ const selectedWeek = ref({
 
 // Group activities by weeks based on active goal's start date
 const groupedWeeks = computed(() => {
-  const activeGoal = goalStore.getActiveGoal;
-  if (!activeGoal || !activeGoal.firstActiveDate) return [];
+  const activeGoal = goalStore.activeGoal;
+  if (!activeGoal || !activeGoal.start_date) return [];
 
-  const startDate = new Date(activeGoal.firstActiveDate);
-  const endDate = new Date(activeGoal.endDate);
+  const startDate = new Date(activeGoal.start_date);
+  const endDate = new Date(activeGoal.end_date);
   const weeks = [];
   let currentDate = new Date(startDate);
   let weekNumber = 1;
@@ -69,11 +69,13 @@ const groupedWeeks = computed(() => {
   while (currentDate <= endDate) {
     const weekStart = currentDate.toISOString();
     const weekEnd = new Date(currentDate);
-    weekEnd.setDate(weekEnd.getDate() + (activeGoal.daysPerWeek - 1));
+    // Default to 7 days if daysPerWeek is not set
+    const daysPerWeek = activeGoal.daysPerWeek || 7;
+    weekEnd.setDate(weekEnd.getDate() + (daysPerWeek - 1));
 
     // Get activities for this week
     const weekActivities = store.activities.filter((activity) => {
-      const activityDate = new Date(activity.dateCreated);
+      const activityDate = new Date(activity.created_at); // Changed from dateCreated
       // Normalize dates by setting them to midnight
       activityDate.setHours(0, 0, 0, 0);
       const startOfDay = new Date(currentDate);
@@ -86,36 +88,33 @@ const groupedWeeks = computed(() => {
 
       return isInRange && isDone;
     });
-    // console.log("week activities: ", weekActivities);
 
     // Calculate active days (unique days with completed activities)
     const activeDays = new Set(
-      weekActivities.map((activity) =>
-        new Date(activity.dateCreated).toDateString(),
+      weekActivities.map(
+        (activity) => new Date(activity.created_at).toDateString(), // Changed from dateCreated
       ),
     ).size;
 
-    // Calculate percentage complete
+    // Calculate percentage complete using default 7 days if needed
     const totalPoints = weekActivities.reduce(
       (sum, activity) => sum + activity.points,
       0,
     );
-    const maxPoints = activeGoal.daysPerWeek * 100;
+    const maxPoints = (activeGoal.daysPerWeek || 7) * 100;
     const percentageComplete = Math.round((totalPoints / maxPoints) * 100);
 
     weeks.push({
       weekStart,
       weekNumber,
-      daysPerWeek: activeGoal.daysPerWeek,
+      daysPerWeek: daysPerWeek,
       percentageComplete,
       activeDays,
     });
 
-    currentDate.setDate(currentDate.getDate() + activeGoal.daysPerWeek);
+    currentDate.setDate(currentDate.getDate() + daysPerWeek);
     weekNumber++;
   }
-
-  console.log("Weeks : ", weeks);
 
   return weeks;
 });

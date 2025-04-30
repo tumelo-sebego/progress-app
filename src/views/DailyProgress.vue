@@ -76,25 +76,26 @@ function handleScroll(event) {
 
 // Group activities by date
 const groupedActivities = computed(() => {
-  const activeGoal = goalStore.getActiveGoal;
-  if (!activeGoal || !activeGoal.firstActiveDate) return [];
+  const activeGoal = goalStore.activeGoal;
+  console.log("Active Goal:", activeGoal);
+  if (!activeGoal || !activeGoal.start_date) return [];
 
   const activities = store.activities;
-  const goalStartDate = new Date(activeGoal.firstActiveDate);
-  const goalEndDate = new Date(activeGoal.endDate);
+  const goalStartDate = new Date(activeGoal.start_date);
+  const goalEndDate = new Date(activeGoal.end_date);
 
   // Filter activities within goal date range
   const goalActivities = activities.filter((activity) => {
-    const activityDate = new Date(activity.dateCreated);
+    const activityDate = new Date(activity.created_at);
     return activityDate >= goalStartDate && activityDate <= goalEndDate;
   });
 
   const groups = goalActivities.reduce((acc, activity) => {
-    const date = new Date(activity.dateCreated).toISOString().split("T")[0];
+    const date = new Date(activity.created_at).toISOString().split("T")[0];
 
     if (!acc[date]) {
       acc[date] = {
-        date: new Date(activity.dateCreated),
+        date: new Date(activity.created_at),
         activities: [],
       };
     }

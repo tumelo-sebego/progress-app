@@ -236,7 +236,6 @@ async function handleDone() {
         activitiesToInsert.push({
           title: template.name,
           points: template.points,
-          completed: false,
           created_at: activityDate.toISOString(),
           goal_id: newGoal.id,
           status: "pending",

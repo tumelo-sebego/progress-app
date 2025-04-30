@@ -68,9 +68,8 @@ const dayTimeRange = computed(() => {
   );
 
   if (!completedActivities.length) return "Expired";
-
   const times = completedActivities.map(
-    (activity) => new Date(activity.timeActive),
+    (activity) => new Date(activity.start_time),
   );
   const firstTime = new Date(Math.min(...times));
   const lastTime = new Date(Math.max(...times));

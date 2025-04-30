@@ -102,9 +102,8 @@ function getOrdinalSuffix(day) {
 
 // Computed property to format timeActive
 const formattedTimeActive = computed(() => {
-  console.log("startTime was: ", activity.value.startTime);
-  if (!activity.value.startTime) return "N/A";
-  const date = new Date(activity.value.startTime);
+  if (!activity.value.start_time) return "N/A";
+  const date = new Date(activity.value.start_time);
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   return `${hours}:${minutes}`;
@@ -112,8 +111,8 @@ const formattedTimeActive = computed(() => {
 
 // Computed property to format timeDone
 const formattedTimeDone = computed(() => {
-  if (!activity.value.endTime) return "N/A";
-  const date = new Date(activity.value.endTime);
+  if (!activity.value.end_time) return "N/A";
+  const date = new Date(activity.value.end_time);
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   return `${hours}:${minutes}`;

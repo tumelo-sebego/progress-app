@@ -102,8 +102,9 @@ function getOrdinalSuffix(day) {
 
 // Computed property to format timeActive
 const formattedTimeActive = computed(() => {
-  if (!activity.value.timeActive) return "N/A";
-  const date = new Date(activity.value.timeActive);
+  console.log("startTime was: ", activity.value.startTime);
+  if (!activity.value.startTime) return "N/A";
+  const date = new Date(activity.value.startTime);
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   return `${hours}:${minutes}`;
@@ -111,8 +112,8 @@ const formattedTimeActive = computed(() => {
 
 // Computed property to format timeDone
 const formattedTimeDone = computed(() => {
-  if (!activity.value.timeDone) return "N/A";
-  const date = new Date(activity.value.timeDone);
+  if (!activity.value.endTime) return "N/A";
+  const date = new Date(activity.value.endTime);
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   return `${hours}:${minutes}`;
@@ -120,7 +121,7 @@ const formattedTimeDone = computed(() => {
 
 // Computed property to format the created date
 const formattedCreatedDate = computed(() => {
-  const date = new Date(activity.value.dateCreated);
+  const date = new Date(activity.value.created_at);
   const day = date.getDate();
   const month = date.toLocaleString("en-US", { month: "long" });
   return `${day}${getOrdinalSuffix(day)} ${month}`;

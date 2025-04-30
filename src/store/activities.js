@@ -5,7 +5,9 @@ export const useActivityStore = defineStore("activityStore", {
   state: () => ({
     activities: [],
     currentActivity: null,
+    hasActiveActivity: false,
     progress: 0,
+    activeElapsedTime: 0,
   }),
 
   getters: {
@@ -208,6 +210,10 @@ export const useActivityStore = defineStore("activityStore", {
         this.activities.forEach((activity) => {
           if (activity.id === activityId) {
             this.currentActivity = activity;
+            activity.status = "active";
+            activity.startTime = new Date().toISOString();
+            // Initialize activeElapsedTime with any previous duration
+            this.activeElapsedTime = 0;
           }
         });
         // Set this activity to active and set timeActive
@@ -215,13 +221,66 @@ export const useActivityStore = defineStore("activityStore", {
           .from("activities")
           .update({
             status: "active",
-            timeActive: new Date().toISOString(),
+            start_time: new Date().toISOString(),
           })
           .eq("id", activityId);
 
         if (error) throw error;
+
+        // Update the current activity in the store
+        this.hasActiveActivity = true;
+
+        // Start interval to update activeElapsedTime every second
+        if (this._activeTimer) clearInterval(this._activeTimer);
+        this._activeTimer = setInterval(() => {
+          this.activeElapsedTime += 1;
+        }, 1000);
       } catch (error) {
         console.error("Error starting activity:", error.message);
+      }
+    },
+
+    async stopActivity(activityId) {
+      try {
+        const activity = this.activities.find((a) => a.id === activityId);
+        if (!activity) return;
+
+        // Calculate end time based on start time + elapsed seconds
+        const startTime = new Date(activity.startTime);
+        const endTime = new Date(
+          startTime.getTime() + this.activeElapsedTime * 1000,
+        );
+
+        // Previous duration (if any) + current session duration
+        const duration = (activity.duration || 0) + this.activeElapsedTime;
+
+        // Update local state
+        activity.status = "done";
+        activity.duration = duration;
+        activity.endTime = endTime.toISOString();
+
+        // Update in database
+        const { error } = await supabase
+          .from("activities")
+          .update({
+            status: "done",
+            end_time: endTime.toISOString(),
+            duration: duration,
+          })
+          .eq("id", activityId);
+
+        if (error) throw error;
+
+        this.hasActiveActivity = false;
+
+        // Stop the timer
+        if (this._activeTimer) {
+          clearInterval(this._activeTimer);
+          this._activeTimer = null;
+        }
+        this.activeElapsedTime = 0;
+      } catch (error) {
+        console.error("Error finishing activity:", error.message);
       }
     },
 

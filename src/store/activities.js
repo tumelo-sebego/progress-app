@@ -90,14 +90,48 @@ export const useActivityStore = defineStore("activityStore", {
           data: { user },
         } = await supabase.auth.getUser();
         if (!user) throw new Error("No user logged in");
+
         const { data, error } = await supabase
           .from("activities")
           .select("*")
           .eq("user_id", user.id)
           .eq("goal_id", goalId)
           .order("created_at", { ascending: true });
+
         if (error) throw error;
-        this.activities = data;
+
+        // Check for expired activities
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const updatedActivities = [];
+        const expiredActivities = [];
+
+        data.forEach((activity) => {
+          const activityDate = new Date(activity.created_at);
+          activityDate.setHours(0, 0, 0, 0);
+
+          // If activity date has passed and status is still pending, mark as expired
+          if (activityDate < today && activity.status === "pending") {
+            activity.status = "expired";
+            expiredActivities.push({
+              id: activity.id,
+              status: "expired",
+            });
+          }
+          updatedActivities.push(activity);
+        });
+
+        // Batch update expired activities in the database
+        if (expiredActivities.length > 0) {
+          const { error: updateError } = await supabase
+            .from("activities")
+            .upsert(expiredActivities);
+
+          if (updateError) throw updateError;
+        }
+
+        this.activities = updatedActivities;
         this.calculateProgress();
       } catch (error) {
         console.error("Error fetching activities for goal:", error.message);

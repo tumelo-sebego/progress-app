@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { supabase } from "@/supabase/config";
+import { useAppStore } from "@/store/app";
 import Home from "../views/Home.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
@@ -90,6 +91,15 @@ router.beforeEach(async (to, from, next) => {
   } else {
     next();
   }
+});
+
+router.beforeEach((to, from, next) => {
+  const appStore = useAppStore();
+
+  // Store the current route
+  appStore.setLastRoute(to.fullPath);
+
+  next();
 });
 
 export default router;

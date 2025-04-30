@@ -100,7 +100,6 @@ export const useActivityStore = defineStore("activityStore", {
 
         if (error) throw error;
 
-        // Check for expired activities
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -111,18 +110,23 @@ export const useActivityStore = defineStore("activityStore", {
           const activityDate = new Date(activity.created_at);
           activityDate.setHours(0, 0, 0, 0);
 
-          // If activity date has passed and status is still pending, mark as expired
           if (activityDate < today && activity.status === "pending") {
             activity.status = "expired";
+            // Include all required fields for RLS
             expiredActivities.push({
               id: activity.id,
               status: "expired",
+              user_id: user.id,
+              goal_id: goalId,
+              // Preserve other required fields
+              created_at: activity.created_at,
+              title: activity.title,
+              points: activity.points,
             });
           }
           updatedActivities.push(activity);
         });
 
-        // Batch update expired activities in the database
         if (expiredActivities.length > 0) {
           const { error: updateError } = await supabase
             .from("activities")
@@ -230,30 +234,32 @@ export const useActivityStore = defineStore("activityStore", {
 
     async startActivity(activityId) {
       try {
+        const startTime = new Date().toISOString();
+
+        // Update local state
         this.activities.forEach((activity) => {
           if (activity.id === activityId) {
             this.currentActivity = activity;
             activity.status = "active";
-            activity.startTime = new Date().toISOString();
-            // Initialize activeElapsedTime with any previous duration
+            activity.start_time = startTime;
             this.activeElapsedTime = 0;
           }
         });
-        // Set this activity to active and set timeActive
+
+        // Update database
         const { error } = await supabase
           .from("activities")
           .update({
             status: "active",
-            start_time: new Date().toISOString(),
+            start_time: startTime,
           })
           .eq("id", activityId);
 
         if (error) throw error;
 
-        // Update the current activity in the store
         this.hasActiveActivity = true;
 
-        // Start interval to update activeElapsedTime every second
+        // Start interval to update activeElapsedTime
         if (this._activeTimer) clearInterval(this._activeTimer);
         this._activeTimer = setInterval(() => {
           this.activeElapsedTime += 1;
@@ -304,6 +310,24 @@ export const useActivityStore = defineStore("activityStore", {
         this.activeElapsedTime = 0;
       } catch (error) {
         console.error("Error finishing activity:", error.message);
+      }
+    },
+
+    // Add new method to restore timer state
+    restoreTimerState() {
+      const activeActivity = this.activities.find((a) => a.status === "active");
+      if (activeActivity?.start_time) {
+        const startTime = new Date(activeActivity.start_time);
+        const now = new Date();
+        this.activeElapsedTime = Math.floor((now - startTime) / 1000);
+        this.hasActiveActivity = true;
+        this.currentActivity = activeActivity;
+
+        // Restart the timer
+        if (this._activeTimer) clearInterval(this._activeTimer);
+        this._activeTimer = setInterval(() => {
+          this.activeElapsedTime += 1;
+        }, 1000);
       }
     },
 

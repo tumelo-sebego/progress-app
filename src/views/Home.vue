@@ -100,6 +100,7 @@ function getOrdinalSuffix(day) {
 const loadTasks = async () => {
   if (!activeGoal.value) return;
   await store.fetchActivitiesForGoal(activeGoal.value.id);
+  store.restoreTimerState(); // Add this line
 };
 
 const progress = computed(() => {

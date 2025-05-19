@@ -8,11 +8,17 @@ export const useAppStore = defineStore("app", {
     user: null,
     lastRoute: localStorage.getItem("lastRoute") || "/",
     session: null,
+    hasInitialized: localStorage.getItem("hasInitialized") === "true",
   }),
 
   actions: {
     async initializeAuth() {
       try {
+        // Skip if already initialized
+        if (this.hasInitialized) {
+          return true;
+        }
+
         // Check for existing session
         const {
           data: { session },
@@ -21,6 +27,8 @@ export const useAppStore = defineStore("app", {
         if (session) {
           this.session = session;
           this.user = session.user;
+          this.hasInitialized = true;
+          localStorage.setItem("hasInitialized", "true");
           return true;
         }
 
@@ -40,6 +48,8 @@ export const useAppStore = defineStore("app", {
       this.user = null;
       this.session = null;
       this.isAppInitialized = false;
+      this.hasInitialized = false;
+      localStorage.removeItem("hasInitialized");
     },
   },
 });

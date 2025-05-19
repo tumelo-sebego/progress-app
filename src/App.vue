@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAppStore } from "@/store/app";
 import { useGoalSettingsStore } from "@/store/goalSettings";
@@ -16,12 +16,12 @@ const route = useRoute();
 const appStore = useAppStore();
 const goalStore = useGoalSettingsStore();
 const isReady = ref(false);
-const hasInitialized = ref(false); // Add this flag
+const hasInitialized = ref(localStorage.getItem("hasInitialized") === "true");
 
 async function determineInitialRoute() {
   try {
     // Skip if already initialized
-    if (hasInitialized.value) {
+    if (appStore.hasInitialized) {
       isReady.value = true;
       return;
     }
@@ -71,12 +71,25 @@ async function determineInitialRoute() {
     router.push("/login");
   } finally {
     isReady.value = true;
-    hasInitialized.value = true; // Mark as initialized
+    hasInitialized.value = true;
+    localStorage.setItem("hasInitialized", "true");
+  }
+}
+
+// Handle visibility changes
+function handleVisibilityChange() {
+  if (!document.hidden && !hasInitialized.value) {
+    determineInitialRoute();
   }
 }
 
 onMounted(async () => {
   await determineInitialRoute();
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
 });
 </script>
 

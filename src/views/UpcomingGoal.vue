@@ -41,11 +41,13 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useGoalSettingsStore } from "@/store/goalSettings";
 import { useAppStore } from "@/store/app";
+import { useRouter } from "vue-router";
 import Header from "@/components/Header.vue";
 import Navbar from "@/components/Navbar.vue";
 
 const goalStore = useGoalSettingsStore();
 const appStore = useAppStore();
+const router = useRouter();
 const activeTab = ref("home");
 const username = ref("");
 const date = ref("");
@@ -65,6 +67,7 @@ function updateCountdown() {
 
   if (diff <= 0) {
     if (timer) clearInterval(timer);
+    router.push("/home"); // Navigate to home when goal starts
     return;
   }
 
@@ -76,7 +79,16 @@ function updateCountdown() {
   };
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // Check if we should be on this view
+  const now = new Date();
+  const start = new Date(goalStore.activeGoal?.start_date);
+
+  if (!goalStore.activeGoal || start <= now) {
+    router.push("/home");
+    return;
+  }
+
   // Initialize countdown
   updateCountdown();
   timer = setInterval(updateCountdown, 1000);

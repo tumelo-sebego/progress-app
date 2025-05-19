@@ -93,21 +93,26 @@ const goalItems = ref([
 // Function to determine if a tab is active
 function isTabActive(tabId) {
   if (tabId === "calendar") {
-    // The "Goals" tab is active if the submenu is open or a goal view is displayed
     return isGoalsMenuOpen.value || route.path.includes("progress");
   }
-  if (tabId === "home" && route.path === "/upcoming-goal") {
-    return true;
+  
+  // Special handling for home/countdown tab
+  if (tabId === "home") {
+    const hasUpcomingGoal = 
+      goalStore.activeGoal && 
+      new Date(goalStore.activeGoal.start_date) > new Date();
+    
+    if (hasUpcomingGoal) {
+      return route.path === "/upcoming-goal";
+    }
+    return route.path === "/home";
   }
+  
   return activeTab.value === tabId && !isGoalsMenuOpen.value;
 }
 
 // Function to handle navigation for main tabs
 function navigateToTab(tabId) {
-  if (tabId === "home" && route.path === "/upcoming-goal") {
-    return; // Stay on upcoming view
-  }
-
   if (tabId === "calendar") {
     if (!isClosingSubmenu.value) {
       isGoalsMenuOpen.value ? closeGoalsMenu() : openGoalsMenu();
@@ -119,9 +124,15 @@ function navigateToTab(tabId) {
   closeGoalsMenu();
   activeTab.value = tabId;
 
+  // Check for upcoming goal before navigation
+  const hasUpcomingGoal = 
+    goalStore.activeGoal && 
+    new Date(goalStore.activeGoal.start_date) > new Date();
+
   switch (tabId) {
     case "home":
-      if (route.path === "/upcoming-goal") {
+      // If we have an upcoming goal, always go to upcoming-goal view
+      if (hasUpcomingGoal) {
         router.push("/upcoming-goal");
       } else {
         router.push("/home");

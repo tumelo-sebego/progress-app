@@ -110,12 +110,16 @@ const progress = computed(() => {
 });
 
 const checkActiveGoal = async () => {
-  if (!goalStore.activeGoal) {
-    const goal = await goalStore.getLatestActiveGoal();
-    goalStore.setActiveGoal(goal);
-  }
   if (!goalStore.hasActiveGoal) {
-    router.push("/add-goal");
+    // Try to get latest goal if no active goal
+    const latestGoal = await goalStore.getLatestGoal();
+    if (latestGoal) {
+      goalStore.setActiveGoal(latestGoal);
+      await store.fetchActivitiesForGoal(latestGoal.id);
+    } else {
+      // Only redirect if no goals exist at all
+      router.push("/add-goal");
+    }
   }
 };
 

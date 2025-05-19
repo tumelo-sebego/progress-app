@@ -112,21 +112,26 @@ const progress = computed(() => {
 });
 
 const checkActiveGoal = async () => {
-  // Initialize the goal store if not already done
   if (!goalStore.isInitialized) {
     await goalStore.initialize();
   }
 
   if (!goalStore.hasActiveGoal) {
-    // Try to get latest goal if no active goal
     const latestGoal = await goalStore.getLatestGoal();
     if (latestGoal) {
+      const startDate = new Date(latestGoal.start_date);
       const endDate = new Date(latestGoal.end_date);
       const today = new Date();
 
-      // Only set as active if not expired
       if (endDate > today) {
         goalStore.setActiveGoal(latestGoal);
+
+        // Check if goal starts in the future
+        if (startDate > today) {
+          router.push("/upcoming-goal");
+          return;
+        }
+
         await store.fetchActivitiesForGoal(latestGoal.id);
       } else {
         router.push("/add-goal");

@@ -111,40 +111,6 @@ const progress = computed(() => {
     .reduce((total, activity) => total + activity.points, 0);
 });
 
-const checkActiveGoal = async () => {
-  console.log("foo");
-  if (!goalStore.isInitialized) {
-    console.log("Initializing goal store");
-    await goalStore.initialize();
-  }
-
-  if (!goalStore.hasActiveGoal) {
-    console.log("No active goal found");
-    const latestGoal = await goalStore.getLatestGoal();
-    if (latestGoal) {
-      const startDate = new Date(latestGoal.start_date);
-      const endDate = new Date(latestGoal.end_date);
-      const today = new Date();
-
-      if (endDate > today) {
-        goalStore.setActiveGoal(latestGoal);
-
-        // Check if goal starts in the future
-        if (startDate > today) {
-          router.push("/upcoming-goal");
-          return;
-        }
-
-        await store.fetchActivitiesForGoal(latestGoal.id);
-      } else {
-        router.push("/add-goal");
-      }
-    } else {
-      router.push("/add-goal");
-    }
-  }
-};
-
 onMounted(async () => {
   // Format current date
   const today = new Date();
@@ -153,48 +119,13 @@ onMounted(async () => {
   const month = today.toLocaleDateString("en-US", { month: "long" });
   date.value = `${weekday}, ${month} ${day}${getOrdinalSuffix(day)}`;
 
-  let timeoutId;
-  if (!appStore.isAppInitialized) {
-    timeoutId = setTimeout(() => {
-      forceShow.value = true;
-    }, 3000);
+  if (appStore.user?.user_metadata?.full_name) {
+    username.value = appStore.user.user_metadata.full_name;
+  }
 
-    // Use centralized auth
-    const isAuthenticated = await appStore.initializeAuth();
-    if (!isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-
-    // Use stored user info
-    if (appStore.user?.user_metadata?.full_name) {
-      username.value = appStore.user.user_metadata.full_name;
-    }
-
-    await checkActiveGoal();
-    if (hasActiveGoal.value) {
-      await loadTasks();
-    }
-
-    appStore.isAppInitialized = true;
-    if (timeoutId) clearTimeout(timeoutId);
-    forceShow.value = false;
-  } else {
-    // Already initialized, just show content immediately
-    forceShow.value = true;
-    if (appStore.user?.user_metadata?.full_name) {
-      username.value = appStore.user.user_metadata.full_name;
-    }
-
-    if (!goalStore.activeGoal) {
-      await checkActiveGoal();
-    }
-    if (
-      hasActiveGoal.value &&
-      (!store.activities.length || !latestActivities.value.length)
-    ) {
-      await loadTasks();
-    }
+  // Load tasks if we have an active goal
+  if (hasActiveGoal.value) {
+    await loadTasks();
   }
 });
 

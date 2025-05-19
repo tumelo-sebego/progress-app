@@ -126,5 +126,28 @@ export const useGoalSettingsStore = defineStore("goalSettings", {
       this.activeGoal = goal;
       this.hasActiveGoal = !!goal;
     },
+
+    async getLatestGoal() {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) return null;
+
+        const { data, error } = await supabase
+          .from("goals")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
+
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error("Error fetching latest goal:", error);
+        return null;
+      }
+    },
   },
 });

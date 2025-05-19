@@ -3,16 +3,16 @@
     <div class="loading-circle"></div>
   </div>
 
-  <router-view v-if="!hasActiveGoal" name="add-goal" />
-
-  <div v-else class="phone-frame">
+  <div class="phone-frame">
     <div class="h-full flex-col-container">
       <Header :name="username" :date="date" />
 
-      <!-- Show AddGoal if no active goals -->
+      <!-- Show AddGoal or Home content -->
+      <div v-if="!hasActiveGoal" class="content-container">
+        <router-view name="add-goal" />
+      </div>
 
-      <!-- Main Content when active goal exists -->
-      <div class="content-container">
+      <div v-else class="content-container">
         <template v-if="activeTab === 'home'">
           <div class="progress-container">
             <ProgressCircle :progress="progress" />
@@ -22,11 +22,11 @@
             <ActivityItem
               v-for="activity in latestActivities"
               :key="activity.id"
+              :activity="activity"
               :id="activity.id"
               @open-dialog="showDialog" />
           </div>
 
-          <!-- ActivityTimer dialog -->
           <ActivityTimer
             v-if="selectedActivityId"
             v-model:visible="dialogVisible"
@@ -112,14 +112,26 @@ const progress = computed(() => {
 });
 
 const checkActiveGoal = async () => {
+  // Initialize the goal store if not already done
+  if (!goalStore.isInitialized) {
+    await goalStore.initialize();
+  }
+
   if (!goalStore.hasActiveGoal) {
     // Try to get latest goal if no active goal
     const latestGoal = await goalStore.getLatestGoal();
     if (latestGoal) {
-      goalStore.setActiveGoal(latestGoal);
-      await store.fetchActivitiesForGoal(latestGoal.id);
+      const endDate = new Date(latestGoal.end_date);
+      const today = new Date();
+
+      // Only set as active if not expired
+      if (endDate > today) {
+        goalStore.setActiveGoal(latestGoal);
+        await store.fetchActivitiesForGoal(latestGoal.id);
+      } else {
+        router.push("/add-goal");
+      }
     } else {
-      // Only redirect if no goals exist at all
       router.push("/add-goal");
     }
   }

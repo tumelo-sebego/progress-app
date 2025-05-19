@@ -16,9 +16,16 @@ const route = useRoute();
 const appStore = useAppStore();
 const goalStore = useGoalSettingsStore();
 const isReady = ref(false);
+const hasInitialized = ref(false); // Add this flag
 
 async function determineInitialRoute() {
   try {
+    // Skip if already initialized
+    if (hasInitialized.value) {
+      isReady.value = true;
+      return;
+    }
+
     // Only handle routing if we're at root path
     if (route.path !== "/") {
       isReady.value = true;
@@ -64,6 +71,7 @@ async function determineInitialRoute() {
     router.push("/login");
   } finally {
     isReady.value = true;
+    hasInitialized.value = true; // Mark as initialized
   }
 }
 

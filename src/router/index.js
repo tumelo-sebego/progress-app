@@ -14,10 +14,8 @@ import AddGoal from "../views/AddGoal.vue";
 const routes = [
   {
     path: "/",
-    redirect: () => {
-      // Redirect will be handled by App.vue
-      return { path: "/login" };
-    },
+    name: "Root",
+    component: () => import("@/App.vue"),
   },
   {
     path: "/home",
@@ -87,12 +85,19 @@ const router = createRouter({
   routes,
 });
 
+// Update router guard to ignore root path
 router.beforeEach(async (to, from, next) => {
   const appStore = useAppStore();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+
+  // Don't redirect if we're at root - let App.vue handle it
+  if (to.path === "/") {
+    next();
+    return;
+  }
 
   // Store the route before any redirects
   if (to.path !== "/login" && to.path !== "/register") {

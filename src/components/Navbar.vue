@@ -27,10 +27,10 @@
           @click.stop="navigateToTab(tab.id)"
           class="nav-button"
           :class="{ 'active-tab': isTabActive(tab.id) }">
-          <span v-if="isTabActive(tab.id)" class="nav-text">{{
-            tab.text
+          <span v-if="isTabActive(tab.id)" class="nav-text">{{ tab.text }}</span>
+          <span v-else class="material-icons">{{ 
+            getTabIcon(tab.id)
           }}</span>
-          <span v-else class="material-icons">{{ tab.icon }}</span>
         </button>
       </div>
     </div>
@@ -42,17 +42,16 @@ import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useGoalSettingsStore } from "@/store/goalSettings";
 
-const props = defineProps(["active"]);
 const router = useRouter();
 const route = useRoute();
 const goalStore = useGoalSettingsStore();
 
 // State to track the active tab and active goal
-const activeTab = ref(""); // Default to no active tab
-const activeGoal = ref(""); // Default to no active goal
-const isGoalsMenuOpen = ref(false); // Tracks if the submenu is logically open
-const isGoalsMenuVisible = ref(false); // Tracks if the submenu is visible (for animation)
-const isClosingSubmenu = ref(false); // Tracks if the submenu is animating down
+const activeTab = ref("");
+const activeGoal = ref("");
+const isGoalsMenuOpen = ref(false);
+const isGoalsMenuVisible = ref(false);
+const isClosingSubmenu = ref(false);
 
 // Tabs for the main navigation with computed property
 const tabs = computed(() => {
@@ -61,8 +60,12 @@ const tabs = computed(() => {
     { id: "profile", icon: "person", text: "Profile" },
   ];
 
-  // Add either home or add-goal as the first tab
-  if (goalStore.hasActiveGoal) {
+  // Add appropriate first tab based on route and goal state
+  const isUpcomingView = route.path === "/upcoming-goal";
+  
+  if (isUpcomingView) {
+    baseTabs.unshift({ id: "home", icon: "schedule", text: "Countdown" });
+  } else if (goalStore.hasActiveGoal) {
     baseTabs.unshift({ id: "home", icon: "home", text: "Home" });
   } else {
     baseTabs.unshift({ id: "add-goal", icon: "add", text: "Add Goal" });
@@ -70,6 +73,12 @@ const tabs = computed(() => {
 
   return baseTabs;
 });
+
+// Function to get the correct icon for a tab
+function getTabIcon(tabId) {
+  const tab = tabs.value.find(t => t.id === tabId);
+  return tab ? tab.icon : "";
+}
 
 // Submenu items for the "Goals" tab
 const goalItems = ref([
@@ -84,36 +93,43 @@ function isTabActive(tabId) {
     // The "Goals" tab is active if the submenu is open or a goal view is displayed
     return isGoalsMenuOpen.value || route.path.includes("progress");
   }
+  if (tabId === "home" && route.path === "/upcoming-goal") {
+    return true;
+  }
   return activeTab.value === tabId && !isGoalsMenuOpen.value;
 }
 
 // Function to handle navigation for main tabs
 function navigateToTab(tabId) {
-  if (tabId === "add-goal") {
-    // Close any open menus and navigate to add goal
-    closeGoalsMenu();
-    activeTab.value = tabId;
-    router.push("/add-goal");
-    return;
+  if (tabId === "home" && route.path === "/upcoming-goal") {
+    return; // Stay on upcoming view
   }
 
   if (tabId === "calendar") {
-    // Prevent any action if animation is in progress
-    if (isClosingSubmenu.value) {
-      return;
-    }
-
-    // Toggle menu state
-    if (isGoalsMenuOpen.value) {
-      closeGoalsMenu();
-    } else {
-      openGoalsMenu();
+    if (!isClosingSubmenu.value) {
+      isGoalsMenuOpen.value ? closeGoalsMenu() : openGoalsMenu();
       activeTab.value = "calendar";
     }
-  } else {
-    closeGoalsMenu();
-    activeTab.value = tabId;
-    router.push(`/${tabId === "home" ? "" : tabId}`);
+    return;
+  }
+
+  closeGoalsMenu();
+  activeTab.value = tabId;
+  
+  switch (tabId) {
+    case "home":
+      if (route.path === "/upcoming-goal") {
+        router.push("/upcoming-goal");
+      } else {
+        router.push("/home");
+      }
+      break;
+    case "profile":
+      router.push("/profile");
+      break;
+    case "add-goal":
+      router.push("/add-goal");
+      break;
   }
 }
 
@@ -164,7 +180,9 @@ function handleAnimationEnd() {
 
 // Initialize the active tab based on the current route
 onMounted(() => {
-  if (route.path === "/") {
+  if (route.path === "/upcoming-goal") {
+    activeTab.value = "home";
+  } else if (route.path === "/") {
     activeTab.value = "home"; // Default to "Home" tab
   } else if (route.path.includes("progress")) {
     activeTab.value = "calendar"; // Default to "Goals" tab if a submenu view is active
@@ -194,46 +212,6 @@ onBeforeUnmount(() => {
 function isGoalViewActive(goalId) {
   return route.path.includes(`${goalId}progress`);
 }
-
-const navItems = computed(() => {
-  const baseTabs = [
-    { id: "calendar", icon: "calendar_today", text: "Goals" },
-    { id: "profile", icon: "person", text: "Profile" },
-  ];
-
-  // Check if we're on the upcoming goal view
-  const isUpcomingView = router.currentRoute.value.path === "/upcoming-goal";
-
-  if (isUpcomingView) {
-    baseTabs.unshift({ id: "home", icon: "schedule", text: "Countdown" });
-  } else if (goalStore.hasActiveGoal) {
-    baseTabs.unshift({ id: "home", icon: "home", text: "Home" });
-  } else {
-    baseTabs.unshift({ id: "add-goal", icon: "add", text: "Add Goal" });
-  }
-
-  return baseTabs;
-});
-
-const handleTabClick = (tabId) => {
-  switch (tabId) {
-    case "home":
-      if (router.currentRoute.value.path === "/upcoming-goal") {
-        return; // Stay on upcoming view
-      }
-      router.push("/home");
-      break;
-    case "calendar":
-      router.push("/goals");
-      break;
-    case "profile":
-      router.push("/profile");
-      break;
-    case "add-goal":
-      router.push("/add-goal");
-      break;
-  }
-};
 </script>
 
 <style scoped>

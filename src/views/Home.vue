@@ -7,12 +7,7 @@
     <div class="h-full flex-col-container">
       <Header :name="username" :date="date" />
 
-      <!-- Show AddGoal or Home content -->
-      <div v-if="!hasActiveGoal" class="content-container">
-        <router-view name="add-goal" />
-      </div>
-
-      <div v-else class="content-container">
+      <div class="content-container">
         <template v-if="activeTab === 'home'">
           <div class="progress-container">
             <ProgressCircle :progress="progress" />
@@ -44,7 +39,7 @@
 import { ref, onMounted, computed } from "vue";
 import { useActivityStore } from "@/store/activities";
 import { useGoalSettingsStore } from "@/store/goalSettings";
-import { useRouter } from "vue-router";
+// import { useRouter } from "vue-router";
 import Header from "@/components/Header.vue";
 import ProgressCircle from "@/components/ProgressCircle.vue";
 import ActivityItem from "@/components/ActivityItem.vue";
@@ -54,7 +49,7 @@ import ActivityTimer from "@/components/ActivityTimer.vue";
 import { useAppStore } from "@/store/app";
 
 const appStore = useAppStore();
-const router = useRouter();
+// const router = useRouter();
 const store = useActivityStore();
 const goalStore = useGoalSettingsStore();
 

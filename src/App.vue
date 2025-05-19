@@ -7,18 +7,24 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { useAppStore } from "@/store/app";
 import { useGoalSettingsStore } from "@/store/goalSettings";
-// import { supabase } from "@/supabase/config";
 
 const router = useRouter();
+const route = useRoute();
 const appStore = useAppStore();
 const goalStore = useGoalSettingsStore();
 const isReady = ref(false);
 
 async function determineInitialRoute() {
   try {
+    // Only handle routing if we're at root path
+    if (route.path !== "/") {
+      isReady.value = true;
+      return;
+    }
+
     // Check authentication
     const isAuthenticated = await appStore.initializeAuth();
     if (!isAuthenticated) {
@@ -39,7 +45,6 @@ async function determineInitialRoute() {
         router.push("/add-goal");
         return;
       }
-
       goalStore.setActiveGoal(latestGoal);
     }
 
@@ -57,12 +62,13 @@ async function determineInitialRoute() {
   } catch (error) {
     console.error("Error determining initial route:", error);
     router.push("/login");
+  } finally {
+    isReady.value = true;
   }
 }
 
 onMounted(async () => {
   await determineInitialRoute();
-  isReady.value = true;
 });
 </script>
 

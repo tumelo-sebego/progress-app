@@ -103,7 +103,6 @@ export const useActivityStore = defineStore("activityStore", {
 
         const updatedActivities = [];
         const expiredActivities = [];
-        console.log("Fetched activities:", data);
         data.forEach((activity) => {
           const activityDate = new Date(activity.created_at);
           activityDate.setHours(0, 0, 0, 0);
@@ -134,6 +133,7 @@ export const useActivityStore = defineStore("activityStore", {
         }
 
         this.activities = updatedActivities;
+        console.log("Activities fetched successfully:", this.activities);
         this.calculateProgress();
       } catch (error) {
         console.error("Error fetching activities for goal:", error.message);

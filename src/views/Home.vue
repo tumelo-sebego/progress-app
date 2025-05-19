@@ -73,7 +73,6 @@ const latestActivities = computed(() => {
   const dd = String(today.getDate()).padStart(2, "0");
   const todayStr = `${yyyy}-${mm}-${dd}`;
   const activities = store.getActivitiesByDate(todayStr) || [];
-  console.log("Latest activities:", activities); // Debug log
   return activities;
 });
 
@@ -154,7 +153,6 @@ onMounted(async () => {
 
     await checkActiveGoal();
     if (hasActiveGoal.value) {
-      console.log("Active goal found");
       await loadTasks();
     }
 

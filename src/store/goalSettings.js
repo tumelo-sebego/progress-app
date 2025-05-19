@@ -5,11 +5,19 @@ export const useGoalSettingsStore = defineStore("goalSettings", {
   state: () => ({
     goals: [],
     activeGoal: null,
-    hasActiveGoal: false,
     isInitialized: false,
   }),
 
   getters: {
+    // Add hasActiveGoal as a getter
+    hasActiveGoal: (state) => {
+      const today = new Date();
+      return state.goals.some((goal) => {
+        const endDate = new Date(goal.end_date);
+        return endDate > today;
+      });
+    },
+
     // Get latest goal from cached goals
     latestGoal: (state) => {
       return state.goals[0]; // goals are already ordered by created_at desc
@@ -72,7 +80,6 @@ export const useGoalSettingsStore = defineStore("goalSettings", {
 
     setActiveGoal(goal) {
       this.activeGoal = goal;
-      this.hasActiveGoal = !!goal;
     },
 
     // Other existing actions remain the same but should call fetchGoals after mutations

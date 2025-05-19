@@ -14,6 +14,13 @@ import AddGoal from "../views/AddGoal.vue";
 const routes = [
   {
     path: "/",
+    redirect: () => {
+      // Redirect will be handled by App.vue
+      return { path: "/login" };
+    },
+  },
+  {
+    path: "/home",
     name: "Home",
     components: {
       default: Home,

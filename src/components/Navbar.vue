@@ -42,6 +42,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useGoalSettingsStore } from "@/store/goalSettings";
 
+const props = defineProps(["active"]);
 const router = useRouter();
 const route = useRoute();
 const goalStore = useGoalSettingsStore();
@@ -193,6 +194,46 @@ onBeforeUnmount(() => {
 function isGoalViewActive(goalId) {
   return route.path.includes(`${goalId}progress`);
 }
+
+const navItems = computed(() => {
+  const baseTabs = [
+    { id: "calendar", icon: "calendar_today", text: "Goals" },
+    { id: "profile", icon: "person", text: "Profile" },
+  ];
+
+  // Check if we're on the upcoming goal view
+  const isUpcomingView = router.currentRoute.value.path === "/upcoming-goal";
+
+  if (isUpcomingView) {
+    baseTabs.unshift({ id: "home", icon: "schedule", text: "Countdown" });
+  } else if (goalStore.hasActiveGoal) {
+    baseTabs.unshift({ id: "home", icon: "home", text: "Home" });
+  } else {
+    baseTabs.unshift({ id: "add-goal", icon: "add", text: "Add Goal" });
+  }
+
+  return baseTabs;
+});
+
+const handleTabClick = (tabId) => {
+  switch (tabId) {
+    case "home":
+      if (router.currentRoute.value.path === "/upcoming-goal") {
+        return; // Stay on upcoming view
+      }
+      router.push("/home");
+      break;
+    case "calendar":
+      router.push("/goals");
+      break;
+    case "profile":
+      router.push("/profile");
+      break;
+    case "add-goal":
+      router.push("/add-goal");
+      break;
+  }
+};
 </script>
 
 <style scoped>

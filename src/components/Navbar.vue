@@ -27,10 +27,10 @@
           @click.stop="navigateToTab(tab.id)"
           class="nav-button"
           :class="{ 'active-tab': isTabActive(tab.id) }">
-          <span v-if="isTabActive(tab.id)" class="nav-text">{{ tab.text }}</span>
-          <span v-else class="material-icons">{{ 
-            getTabIcon(tab.id)
+          <span v-if="isTabActive(tab.id)" class="nav-text">{{
+            tab.text
           }}</span>
+          <span v-else class="material-icons">{{ getTabIcon(tab.id) }}</span>
         </button>
       </div>
     </div>
@@ -53,17 +53,20 @@ const isGoalsMenuOpen = ref(false);
 const isGoalsMenuVisible = ref(false);
 const isClosingSubmenu = ref(false);
 
-// Tabs for the main navigation with computed property
+// Update the tabs computed property
 const tabs = computed(() => {
   const baseTabs = [
     { id: "calendar", icon: "calendar_today", text: "Goals" },
     { id: "profile", icon: "person", text: "Profile" },
   ];
 
-  // Add appropriate first tab based on route and goal state
-  const isUpcomingView = route.path === "/upcoming-goal";
-  
-  if (isUpcomingView) {
+  // Check if we're dealing with an upcoming goal
+  const hasUpcomingGoal =
+    goalStore.activeGoal &&
+    new Date(goalStore.activeGoal.start_date) > new Date();
+
+  if (hasUpcomingGoal) {
+    // Always show clock icon for upcoming goal
     baseTabs.unshift({ id: "home", icon: "schedule", text: "Countdown" });
   } else if (goalStore.hasActiveGoal) {
     baseTabs.unshift({ id: "home", icon: "home", text: "Home" });
@@ -76,7 +79,7 @@ const tabs = computed(() => {
 
 // Function to get the correct icon for a tab
 function getTabIcon(tabId) {
-  const tab = tabs.value.find(t => t.id === tabId);
+  const tab = tabs.value.find((t) => t.id === tabId);
   return tab ? tab.icon : "";
 }
 
@@ -115,7 +118,7 @@ function navigateToTab(tabId) {
 
   closeGoalsMenu();
   activeTab.value = tabId;
-  
+
   switch (tabId) {
     case "home":
       if (route.path === "/upcoming-goal") {

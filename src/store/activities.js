@@ -317,17 +317,31 @@ export const useActivityStore = defineStore("activityStore", {
     restoreTimerState() {
       const activeActivity = this.activities.find((a) => a.status === "active");
       if (activeActivity?.start_time) {
-        const startTime = new Date(activeActivity.start_time);
-        const now = new Date();
-        this.activeElapsedTime = Math.floor((now - startTime) / 1000);
-        this.hasActiveActivity = true;
-        this.currentActivity = activeActivity;
+        // Parse the ISO string directly to get UTC timestamp
+        const startTimeUTC = Date.parse(activeActivity.start_time);
+        const nowUTC = Date.now();
 
-        // Restart the timer
-        if (this._activeTimer) clearInterval(this._activeTimer);
-        this._activeTimer = setInterval(() => {
-          this.activeElapsedTime += 1;
-        }, 1000);
+        // Calculate elapsed time in seconds
+        const elapsedSeconds = Math.floor((nowUTC - startTimeUTC) / 1000);
+
+        // Validate elapsed time is reasonable (between 0 and 24 hours)
+        if (elapsedSeconds >= 0 && elapsedSeconds <= 24 * 60 * 60) {
+          this.activeElapsedTime = elapsedSeconds;
+          this.hasActiveActivity = true;
+          this.currentActivity = activeActivity;
+
+          // Restart the timer
+          if (this._activeTimer) clearInterval(this._activeTimer);
+          this._activeTimer = setInterval(() => {
+            this.activeElapsedTime += 1;
+          }, 1000);
+        } else {
+          console.warn(
+            `Invalid elapsed time (${elapsedSeconds}s), stopping activity`,
+          );
+          // Stop the activity if time is invalid
+          this.stopActivity(activeActivity.id);
+        }
       }
     },
 

@@ -503,6 +503,29 @@ async function handleDone() {
 
 .activities-list {
   margin-top: 1.5rem;
+  max-height: calc(
+    100vh - 350px
+  ); /* Adjust height to leave space for other elements */
+  overflow-y: auto;
+  padding-bottom: 1rem; /* Add padding to prevent content from touching bottom */
+
+  /* Add smooth scrolling */
+  scroll-behavior: smooth;
+
+  /* Style the scrollbar */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #eaeed3;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #50a65d;
+    border-radius: 4px;
+  }
 }
 
 .activity-item {

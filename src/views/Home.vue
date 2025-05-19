@@ -50,7 +50,7 @@ import ProgressCircle from "@/components/ProgressCircle.vue";
 import ActivityItem from "@/components/ActivityItem.vue";
 import Navbar from "@/components/Navbar.vue";
 import ActivityTimer from "@/components/ActivityTimer.vue";
-import { supabase } from "@/supabase/config";
+// import { supabase } from "@/supabase/config";
 import { useAppStore } from "@/store/app";
 
 const appStore = useAppStore();
@@ -72,7 +72,9 @@ const latestActivities = computed(() => {
   const mm = String(today.getMonth() + 1).padStart(2, "0");
   const dd = String(today.getDate()).padStart(2, "0");
   const todayStr = `${yyyy}-${mm}-${dd}`;
-  return store.getActivitiesByDate(todayStr) || [];
+  const activities = store.getActivitiesByDate(todayStr) || [];
+  console.log("Latest activities:", activities); // Debug log
+  return activities;
 });
 
 const dialogVisible = ref(false);
@@ -99,6 +101,7 @@ function getOrdinalSuffix(day) {
 
 const loadTasks = async () => {
   if (!activeGoal.value) return;
+  console.log("Loading tasks for goal:", activeGoal.value.id);
   await store.fetchActivitiesForGoal(activeGoal.value.id);
   store.restoreTimerState(); // Add this line
 };
@@ -151,6 +154,7 @@ onMounted(async () => {
 
     await checkActiveGoal();
     if (hasActiveGoal.value) {
+      console.log("Active goal found");
       await loadTasks();
     }
 

@@ -18,7 +18,6 @@ export const useActivityStore = defineStore("activityStore", {
       date.setHours(0, 0, 0, 0);
       const nextDay = new Date(date);
       nextDay.setDate(date.getDate() + 1);
-
       return state.activities.filter((activity) => {
         const activityDate = new Date(activity.created_at);
         return activityDate >= date && activityDate < nextDay;
@@ -104,7 +103,7 @@ export const useActivityStore = defineStore("activityStore", {
 
         const updatedActivities = [];
         const expiredActivities = [];
-
+        console.log("Fetched activities:", data);
         data.forEach((activity) => {
           const activityDate = new Date(activity.created_at);
           activityDate.setHours(0, 0, 0, 0);

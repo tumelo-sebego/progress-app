@@ -67,6 +67,12 @@ const routes = [
     component: GoalProgress,
     meta: { requiresAuth: true },
   },
+  {
+    path: "/upcoming-goal",
+    name: "UpcomingGoal",
+    component: () => import("@/views/UpcomingGoal.vue"),
+    meta: { requiresAuth: true },
+  },
 ];
 
 const router = createRouter({

@@ -112,11 +112,14 @@ const progress = computed(() => {
 });
 
 const checkActiveGoal = async () => {
+  console.log("foo");
   if (!goalStore.isInitialized) {
+    console.log("Initializing goal store");
     await goalStore.initialize();
   }
 
   if (!goalStore.hasActiveGoal) {
+    console.log("No active goal found");
     const latestGoal = await goalStore.getLatestGoal();
     if (latestGoal) {
       const startDate = new Date(latestGoal.start_date);

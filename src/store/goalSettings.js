@@ -9,12 +9,16 @@ export const useGoalSettingsStore = defineStore("goalSettings", {
   }),
 
   getters: {
-    // Add hasActiveGoal as a getter
+    // Check if there's a currently active goal (not expired and not in future)
     hasActiveGoal: (state) => {
       const today = new Date();
       return state.goals.some((goal) => {
+        const startDate = new Date(goal.start_date);
         const endDate = new Date(goal.end_date);
-        return endDate > today;
+        // Goal is active if:
+        // 1. Start date has passed or is today (goal has started)
+        // 2. End date is in the future (goal hasn't expired)
+        return startDate <= today && endDate > today;
       });
     },
 

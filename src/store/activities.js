@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { supabase } from "@/supabase/config";
+import { useAppStore } from "./app";
 
 export const useActivityStore = defineStore("activityStore", {
   state: () => ({
@@ -86,15 +87,13 @@ export const useActivityStore = defineStore("activityStore", {
 
     async fetchActivitiesForGoal(goalId) {
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (!user) throw new Error("No user logged in");
+        const appStore = useAppStore();
+        if (!appStore.user) throw new Error("No authenticated user");
 
         const { data, error } = await supabase
           .from("activities")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", appStore.user.id)
           .eq("goal_id", goalId)
           .order("created_at", { ascending: true });
 
@@ -116,7 +115,7 @@ export const useActivityStore = defineStore("activityStore", {
             expiredActivities.push({
               id: activity.id,
               status: "expired",
-              user_id: user.id,
+              user_id: appStore.user.id,
               goal_id: goalId,
               // Preserve other required fields
               created_at: activity.created_at,

@@ -133,22 +133,20 @@ onMounted(async () => {
 
   let timeoutId;
   if (!appStore.isAppInitialized) {
-    // Start 3 second timeout
     timeoutId = setTimeout(() => {
       forceShow.value = true;
     }, 3000);
 
-    // Only fetch user/auth info if not already initialized
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
+    // Use centralized auth
+    const isAuthenticated = await appStore.initializeAuth();
+    if (!isAuthenticated) {
       router.push("/login");
       return;
     }
-    appStore.user = user;
-    if (user?.user_metadata?.full_name) {
-      username.value = user.user_metadata.full_name;
+
+    // Use stored user info
+    if (appStore.user?.user_metadata?.full_name) {
+      username.value = appStore.user.user_metadata.full_name;
     }
 
     await checkActiveGoal();
@@ -166,12 +164,11 @@ onMounted(async () => {
       username.value = appStore.user.user_metadata.full_name;
     }
 
-    // Use stored activeGoal, only fetch if missing
     if (!goalStore.activeGoal) {
       await checkActiveGoal();
     }
     if (
-      goalStore.hasActiveGoal &&
+      hasActiveGoal.value &&
       (!store.activities.length || !latestActivities.value.length)
     ) {
       await loadTasks();

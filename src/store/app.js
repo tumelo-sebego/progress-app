@@ -11,15 +11,14 @@ export const useAppStore = defineStore("app", {
     hasInitialized: localStorage.getItem("hasInitialized") === "true",
   }),
 
+  getters: {
+    userData: (state) => state.user?.user_metadata,
+    isAuthenticated: (state) => !!state.session,
+  },
+
   actions: {
     async initializeAuth() {
       try {
-        // Skip if already initialized
-        if (this.hasInitialized) {
-          return true;
-        }
-
-        // Check for existing session
         const {
           data: { session },
         } = await supabase.auth.getSession();
@@ -27,6 +26,7 @@ export const useAppStore = defineStore("app", {
         if (session) {
           this.session = session;
           this.user = session.user;
+          this.isAppInitialized = true;
           this.hasInitialized = true;
           localStorage.setItem("hasInitialized", "true");
           return true;

@@ -114,9 +114,8 @@ onMounted(async () => {
   const month = today.toLocaleDateString("en-US", { month: "long" });
   date.value = `${weekday}, ${month} ${day}${getOrdinalSuffix(day)}`;
 
-  if (appStore.user?.user_metadata?.full_name) {
-    username.value = appStore.user.user_metadata.full_name;
-  }
+  // Use stored user data
+  username.value = appStore.userData?.full_name || "User";
 
   // Load tasks if we have an active goal
   if (hasActiveGoal.value) {

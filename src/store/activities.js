@@ -88,7 +88,7 @@ export const useActivityStore = defineStore("activityStore", {
       try {
         const appStore = useAppStore();
         if (!appStore.user) throw new Error("No authenticated user");
-
+        console.log("user is: " + appStore.user.id);
         const { data, error } = await supabase
           .from("activities")
           .select("*")

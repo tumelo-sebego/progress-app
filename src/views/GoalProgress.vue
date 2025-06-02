@@ -275,7 +275,6 @@ const completionRate = computed(() => {
 
 <style scoped>
 .phone-frame {
-  max-width: 440px;
   margin: 0 auto;
   min-height: 100vh;
   background-color: rgb(250 251 231);
@@ -293,9 +292,11 @@ const completionRate = computed(() => {
 }
 
 .header-container {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 10;
+  left: 0;
+  right: 0;
+  z-index: 20;
   padding: 1rem 0;
   background-color: rgb(250 251 231);
 }
@@ -320,11 +321,17 @@ const completionRate = computed(() => {
   transform: translateY(-200%);
 }
 
+.goal-title-container {
+  padding: 1.5rem 2rem;
+  background-color: rgb(250 251 231);
+  text-align: center;
+  margin-top: 5rem; /* Add margin-top to account for fixed header */
+}
+
 .content-container {
   flex: 1;
   padding: 0 1rem;
   overflow-y: auto;
-  margin-bottom: 4rem;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -393,12 +400,6 @@ const completionRate = computed(() => {
 .points-text {
   font-size: 1rem;
   font-weight: 500;
-}
-
-.goal-title-container {
-  padding: 1.5rem 2rem;
-  background-color: rgb(250 251 231);
-  text-align: center;
 }
 
 .goal-title {

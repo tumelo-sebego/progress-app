@@ -154,7 +154,6 @@ function showWeekDetails(week) {
 
 <style scoped>
 .phone-frame {
-  max-width: 440px;
   margin: 0 auto;
   min-height: 100vh;
   background-color: rgb(250 251 231);
@@ -172,9 +171,11 @@ function showWeekDetails(week) {
 }
 
 .header-container {
-  position: sticky;
+  position: fixed; /* Change from sticky to fixed */
   top: 0;
-  z-index: 10;
+  left: 0;
+  right: 0;
+  z-index: 20; /* Increase z-index */
   padding: 1rem 0;
   background-color: rgb(250 251 231);
 }
@@ -204,6 +205,7 @@ function showWeekDetails(week) {
   padding: 0 1rem;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  margin-top: 5rem; /* Add margin-top to prevent content from going under header */
 }
 
 .weeks-container {

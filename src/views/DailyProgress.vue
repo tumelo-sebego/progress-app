@@ -133,7 +133,6 @@ function showDayDetails(date) {
 
 <style scoped>
 .phone-frame {
-  max-width: 440px;
   margin: 0 auto;
   min-height: 100vh;
   background-color: rgb(250 251 231);
@@ -151,9 +150,11 @@ function showDayDetails(date) {
 }
 
 .header-container {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 10;
+  left: 0;
+  right: 0;
+  z-index: 20;
   padding: 1rem 0;
   background-color: rgb(250 251 231);
 }
@@ -183,6 +184,7 @@ function showDayDetails(date) {
   padding: 0 1rem;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  margin-top: 5rem;
 }
 
 .days-container {

@@ -110,13 +110,19 @@ const selectedDayDate = ref("");
 const weekDays = computed(() => {
   const days = [];
   const startDate = new Date(props.week.weekStart);
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
 
   for (let i = 0; i < props.week.daysPerWeek; i++) {
     const currentDate = new Date(startDate);
     currentDate.setDate(startDate.getDate() + i);
-    days.push({
-      date: currentDate.toISOString(),
-    });
+
+    // Only add days up to today
+    if (currentDate <= today) {
+      days.push({
+        date: currentDate.toISOString(),
+      });
+    }
   }
 
   return days;

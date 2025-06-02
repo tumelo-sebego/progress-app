@@ -292,33 +292,31 @@ const completionRate = computed(() => {
 }
 
 .header-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
-  padding: 1rem 0;
   background-color: rgb(250 251 231);
+  padding: 1rem 0;
 }
 
 .page-header {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
   background-color: #50a65d;
   color: #232323;
   padding: 0.25rem;
   border-radius: 9999px;
   width: 20rem;
-  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transform: translateY(0);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
 }
 
 .header-hidden {
-  transform: translateY(-200%);
+  transform: translate(-50%, -200%);
 }
 
 .goal-title-container {

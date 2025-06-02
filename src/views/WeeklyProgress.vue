@@ -74,7 +74,7 @@ const groupedWeeks = computed(() => {
     const daysPerWeek = activeGoal.daysPerWeek || 7;
     weekEnd.setDate(weekEnd.getDate() + (daysPerWeek - 1));
 
-    // Get full week's activities (including future days for accurate counting)
+    // Get all activities for the week
     const weekActivities = store.activities.filter((activity) => {
       const activityDate = new Date(activity.created_at);
       activityDate.setHours(0, 0, 0, 0);
@@ -90,40 +90,33 @@ const groupedWeeks = computed(() => {
       );
     });
 
-    // Calculate days that have passed in this week
-    const availableDays = Math.min(
-      daysPerWeek,
-      Math.floor(
-        (Math.min(today, weekEnd) - currentDate) / (1000 * 60 * 60 * 24),
-      ) + 1,
-    );
-
-    // Calculate active days (only count past days)
+    // Count unique days with activities
     const activeDays = new Set(
       weekActivities
-        .filter((activity) => new Date(activity.created_at) <= today)
-        .map((activity) => new Date(activity.created_at).toDateString()),
+        .filter(activity => new Date(activity.created_at) <= today)
+        .map(activity => new Date(activity.created_at).toDateString())
     ).size;
 
-    // Calculate points only for available days
+    // Calculate total points earned
     const totalPoints = weekActivities
-      .filter((activity) => new Date(activity.created_at) <= today)
-      .reduce((sum, activity) => sum + activity.points, 0);
+      .filter(activity => new Date(activity.created_at) <= today)
+      .reduce((sum, activity) => sum + (activity.points || 0), 0);
 
-    // Calculate max possible points for available days
-    const maxPoints = availableDays * 100;
-    const percentageComplete =
-      maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
+    // Calculate max possible points based on total days in week
+    const maxPoints = daysPerWeek * 100;
+    const percentageComplete = Math.round((totalPoints / maxPoints) * 100);
 
     weeks.push({
       weekStart,
       weekNumber,
-      daysPerWeek, // Keep original daysPerWeek for display
+      daysPerWeek,
       percentageComplete,
       activeDays,
-      availableDays, // Add available days for accurate display
-      totalDays: daysPerWeek, // Add total days for reference
+      availableDays: activeDays,     // Number of days with activities
+      totalDays: daysPerWeek,        // Total days expected in the week
       adjustedWeekEnd: weekEnd.toISOString(),
+      totalPoints,                    // Add total points for reference
+      maxPoints                       // Add max points for reference
     });
 
     currentDate.setDate(currentDate.getDate() + daysPerWeek);

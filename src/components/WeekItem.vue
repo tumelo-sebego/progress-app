@@ -7,8 +7,7 @@
         <div class="active-days">
           <i class="pi pi-bolt"></i>
           <span class="days-text"
-            >Active Days: {{ week.activeDays }}/{{ week.availableDays }}
-            <span class="total-days">({{ week.totalDays }} total)</span>
+            >Active Days: {{ week.activeDays }}/{{ week.totalDays }}
           </span>
         </div>
       </div>
@@ -128,6 +127,12 @@ const statusColorClass = computed(() => {
 .days-text {
   color: #232323;
   font-size: 0.875rem;
+}
+
+.total-points {
+  font-size: 0.75rem;
+  color: #666;
+  margin-left: 0.25rem;
 }
 
 .separator {

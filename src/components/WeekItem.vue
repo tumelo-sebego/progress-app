@@ -7,8 +7,9 @@
         <div class="active-days">
           <i class="pi pi-bolt"></i>
           <span class="days-text"
-            >Active Days: {{ week.activeDays }}/{{ week.daysPerWeek }}</span
-          >
+            >Active Days: {{ week.activeDays }}/{{ week.availableDays }}
+            <span class="total-days">({{ week.totalDays }} total)</span>
+          </span>
         </div>
       </div>
       <div class="separator"></div>

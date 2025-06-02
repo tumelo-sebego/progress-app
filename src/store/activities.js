@@ -272,26 +272,22 @@ export const useActivityStore = defineStore("activityStore", {
         const activity = this.activities.find((a) => a.id === activityId);
         if (!activity) return;
 
-        // Calculate end time based on start time + elapsed seconds
-        const startTime = new Date(activity.startTime);
-        const endTime = new Date(
-          startTime.getTime() + this.activeElapsedTime * 1000,
-        );
-
-        // Previous duration (if any) + current session duration
-        const duration = (activity.duration || 0) + this.activeElapsedTime;
+        // Calculate duration and end time
+        const endTime = new Date().toISOString();
+        const startTime = new Date(activity.start_time); // Fixed property name
+        const duration = Math.floor((Date.now() - startTime.getTime()) / 1000);
 
         // Update local state
         activity.status = "done";
         activity.duration = duration;
-        activity.endTime = endTime.toISOString();
+        activity.end_time = endTime;
 
-        // Update in database
+        // Update backend
         const { error } = await supabase
           .from("activities")
           .update({
             status: "done",
-            end_time: endTime.toISOString(),
+            end_time: endTime,
             duration: duration,
           })
           .eq("id", activityId);
@@ -300,7 +296,7 @@ export const useActivityStore = defineStore("activityStore", {
 
         this.hasActiveActivity = false;
 
-        // Stop the timer
+        // Clear timer
         if (this._activeTimer) {
           clearInterval(this._activeTimer);
           this._activeTimer = null;

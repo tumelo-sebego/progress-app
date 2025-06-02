@@ -77,17 +77,22 @@ function handleScroll(event) {
 // Group activities by date
 const groupedActivities = computed(() => {
   const activeGoal = goalStore.activeGoal;
-  console.log("Active Goal:", activeGoal);
   if (!activeGoal || !activeGoal.start_date) return [];
 
   const activities = store.activities;
   const goalStartDate = new Date(activeGoal.start_date);
   const goalEndDate = new Date(activeGoal.end_date);
+  const today = new Date();
+  today.setHours(23, 59, 59, 999); // Set to end of current day
 
-  // Filter activities within goal date range
+  // Filter activities within goal date range and not in the future
   const goalActivities = activities.filter((activity) => {
     const activityDate = new Date(activity.created_at);
-    return activityDate >= goalStartDate && activityDate <= goalEndDate;
+    return (
+      activityDate >= goalStartDate &&
+      activityDate <= goalEndDate &&
+      activityDate <= today
+    );
   });
 
   const groups = goalActivities.reduce((acc, activity) => {
@@ -103,8 +108,21 @@ const groupedActivities = computed(() => {
     return acc;
   }, {});
 
-  // Change sort order to ascending (oldest first)
-  return Object.values(groups).sort((a, b) => a.date - b.date);
+  // Add all past days and today, even if they have no activities
+  let currentDate = new Date(goalStartDate);
+  while (currentDate <= today && currentDate <= goalEndDate) {
+    const dateStr = currentDate.toISOString().split("T")[0];
+    if (!groups[dateStr]) {
+      groups[dateStr] = {
+        date: new Date(currentDate),
+        activities: [],
+      };
+    }
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  // Sort by date (newest first)
+  return Object.values(groups).sort((a, b) => b.date - a.date);
 });
 
 function showDayDetails(date) {

@@ -68,13 +68,13 @@ const latestActivities = computed(() => {
   const dd = String(today.getDate()).padStart(2, "0");
   const todayStr = `${yyyy}-${mm}-${dd}`;
   const activities = store.getActivitiesByDate(todayStr) || [];
-  
+
   // Sort activities with active ones first
   return activities.sort((a, b) => {
     // Active activities go to the top
     if (a.status === "active") return -1;
     if (b.status === "active") return 1;
-    
+
     // Then sort by created_at date for remaining items
     return new Date(b.created_at) - new Date(a.created_at);
   });
